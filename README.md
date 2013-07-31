@@ -1,7 +1,7 @@
 rumps
 =====
 
-**R**idiculously **U**ncomplicated **M**ac os x **P**ython statusbar app**S**
+**R**idiculously **U**ncomplicated **M**ac os x **P**ython statusbar app<strong>S</strong>.
 
 ![pic](https://raw.github.com/jaredks/rumps/master/examples/rumps_example.png)
 
@@ -30,6 +30,8 @@ if __name__ == "__main__":
 ```
 
 How fun!?
+
+`rumps` can greatly shorten the code required to generate a working app. No `PyObjC` underscore syntax required!
 
 
 Use case
