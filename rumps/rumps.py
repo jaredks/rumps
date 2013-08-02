@@ -7,7 +7,7 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 from Foundation import (NSUserNotification, NSUserNotificationCenter, NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode,
                         NSSearchPathForDirectoriesInDomains, NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
 from PyObjCTools import AppHelper
 
 import os
@@ -99,7 +99,6 @@ def _nsimage_from_file(filename, dimensions=None):
         _log('attempting (again) to open image at {}'.format(filename))
         with open(filename):  # file doesn't exist
             pass              # otherwise silently errors in NSImage which isn't helpful for debugging
-    from Foundation import NSImage  # import problem with NSImage; don't want to import it until here
     image = NSImage.alloc().initByReferencingFile_(filename)
     image.setScalesWhenResized_(True)
     image.setSize_((20, 20) if dimensions is None else dimensions)
