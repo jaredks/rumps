@@ -12,7 +12,7 @@ from PyObjCTools import AppHelper
 
 import os
 import sys
-from collections import OrderedDict, Mapping
+from collections import OrderedDict, Mapping, Iterable
 
 
 def debug_mode(choice):
@@ -195,8 +195,16 @@ class MenuItem(OrderedDict):
     based on the NSMenuItem (the only argument passed to callback_).
     """
     _ns_to_py_and_callback = {}
+    _choose_key = object()
+
+    def __new__(cls, *args, **kwargs):
+        if args and isinstance(args[0], cls):  # can safely wrap MenuItem instances
+            return args[0]
+        return super(cls, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, title, callback=None, key='', icon=None, dimensions=None):
+        if isinstance(title, type(self)):  # don't initialize already existing instances
+            return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(str(title), None, '')
         if callable(callback):
             self.set_callback(callback, key)
@@ -207,8 +215,13 @@ class MenuItem(OrderedDict):
     def __setitem__(self, key, value):
         if key in self:
             return
-        if not isinstance(value, MenuItem):
-            raise TypeError('values must be instances of MenuItem class; given {}'.format(type(value)))
+
+        value = MenuItem(value)  # safely convert if not already MenuItem
+        if key is self._choose_key:
+            key = value.title
+        assert key == value.title, ('key {} needs to be the same as the title of the '
+                                    'MenuItem {}').format(repr(key), repr(value.title))
+
         if self._submenu is None:
             self._submenu = NSMenu.alloc().init()
             self._menuitem.setSubmenu_(self._submenu)
@@ -216,13 +229,23 @@ class MenuItem(OrderedDict):
         self._submenu.addItem_(value._menuitem)
         super(MenuItem, self).__setitem__(key, value)
 
+    def __delitem__(self, key):
+        self._submenu.removeItem_(self[key]._menuitem)
+        super(MenuItem, self).__delitem__(key)
+
     def __call__(self):
         return self._menuitem
 
     def __repr__(self):
-        callback = self._ns_to_py_and_callback[self._menuitem][1]
+        try:
+            callback = self._ns_to_py_and_callback[self._menuitem][1]
+        except KeyError:
+            callback = None
         return '<{}: [{} -> {}; callback: {}]>'.format(type(self).__name__, repr(self.title), map(str, self),
                                                        repr(callback))
+
+    def add(self, menuitem):
+        self.__setitem__(self._choose_key, menuitem)
 
     @property
     def title(self):
@@ -514,23 +537,32 @@ class App(object):
             Recursive parser for turning beautiful Python data types into a steaming pile of convoluted OrderedDict
             subclass instances with NSBlah instance attributes... But we hide that from end-developers!
             """
-            for ele in (iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
-                if isinstance(ele, MenuItem):  # we are given an instance of MenuItem so don't create a new one
-                    menu[ele.title] = ele
-                elif isinstance(ele, Mapping):
-                    parse_menu(ele, menu)
-                elif ele is None:                   # None -> visual separator
+            for n, ele in enumerate(iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
+
+                # None -> visual separator
+                if ele is None:
                     sep = NSMenuItem.separatorItem
                     menu[str(id(sep))] = sep
-                elif len(ele) == 1 or isinstance(ele, basestring):  # don't iterate over strings
-                    menu[ele] = MenuItem(ele)
-                elif len(ele) == 2:
-                    title, submenu = ele  # TODO: deal with MenuItem as a key in k,v pair
-                    menu[title] = MenuItem(title)
-                    parse_menu(submenu, menu[title])
+
+                # menu item
+                elif isinstance(ele, (basestring, MenuItem)) or not isinstance(ele, Iterable):
+                    ele = MenuItem(ele)    # >>>
+                    menu[ele.title] = ele  # TODO: menu.add(ele) --> need to deal with top-level add method
+
+                # for mappings we recurse but don't drop down a level in the menu
+                elif isinstance(ele, Mapping):
+                    parse_menu(ele, menu)
+
+                # any other iterables need to be of length 2
                 else:
-                    raise ValueError('menu iterable element {} has length {}; must be a single menu item or a pair '
-                                     'consisting of a menu item and its submenu'.format(ele, len(ele)))
+                    ele = tuple(ele)
+                    if len(ele) != 2:
+                        raise ValueError('menu iterable element #{} has length {}; must be a single menu item or a pair '
+                                         'consisting of a menu item and its submenu'.format(n, len(ele)))
+                    ele, submenu = ele
+                    ele = MenuItem(ele)    # >>>
+                    menu[ele.title] = ele  # TODO: menu.add(ele) --> need to deal with top-level add method
+                    parse_menu(submenu, ele)
             return menu
         obj_c_menu = OrderedDict()  # mainmenu -> NSMenu, directly off of status bar
         self._menu = None if python_menu is None else parse_menu(python_menu, obj_c_menu)

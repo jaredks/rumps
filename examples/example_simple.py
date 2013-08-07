@@ -41,6 +41,10 @@ def notifications(notification):  # function that reacts to incoming notificatio
     print notification
 
 
+def onebitcallback(sender):  # functions don't have to be decorated to serve as callbacks for buttons
+    print 4848484            # this function is specified as a callback when creating a MenuItem below
+
+
 if __name__ == "__main__":
     app = rumps.App("My Toolbar App", title='World, Hello')
     app.menu = [
@@ -49,7 +53,7 @@ if __name__ == "__main__":
         None,  # None functions as a separator in your menu
         {'Arbitrary':
             {"Depth": ["Menus", "It's pretty easy"],
-             "And doesn't": ["Even look like Objective C", "One bit"]}},
+             "And doesn't": ["Even look like Objective C", rumps.MenuItem("One bit", callback=onebitcallback)]}},
         None
     ]
     app.run()

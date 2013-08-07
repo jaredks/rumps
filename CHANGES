@@ -1,6 +1,17 @@
 Changes
 =======
 
+0.1.1 (2013-08-07)
+------------------
+
+- Parsing data structures for creating menus is now more robust
+- Fixed MenuItem __repr__ for printing instances where no callback function has been given
+- Added `example_menu.py` to examples serving also as a test for new MenuItem changes
+- Can now `del` MenuItems of submenus and it will be reflected in the actual menu
+- `add` method for more convenient addition of MenuItems to a MenuItem's submenu
+- Created module docstring
+
+
 0.1.0 (2013-07-31)
 ------------------
 
