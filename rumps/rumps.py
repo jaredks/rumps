@@ -12,7 +12,10 @@ from PyObjCTools import AppHelper
 
 import os
 import sys
+import weakref
 from collections import OrderedDict, Mapping, Iterable
+
+_TIMERS = weakref.WeakSet()
 
 
 def debug_mode(choice):
@@ -81,6 +84,13 @@ def application_support(name):
     return app_support_path
 
 
+def timers():
+    """
+    Returns a set of Timer objects.
+    """
+    return set(_TIMERS)
+
+
 def _nsimage_from_file(filename, dimensions=None):
     """
     Takes a path to an image file and returns an NSImage object.
@@ -134,7 +144,7 @@ def clicked(*args):
                 for arg in args:
                     menuitem = menuitem[arg]
             except KeyError:
-                raise ValueError('no path exists for {}'.format(' -> '.join(args)))
+                raise ValueError('no path exists in menu for {}'.format(' -> '.join(map(repr, args))))
             menuitem.set_callback(f)
 
         # delay registering the button until we have a current instance to be able to traverse the menu
@@ -173,10 +183,12 @@ def _call_as_function_or_method(f, event):
         r = f(event)
         _log('given function {} is outside an App subclass definition'.format(repr(f)))
         return r
-    except TypeError:  # try it with self
-        r = f(getattr(App, '*app_instance'), event)
-        _log('given function {} is probably inside a class (which should be an App subclass)'.format(repr(f)))
-        return r
+    except TypeError as e:  # possibly try it with self if TypeError makes sense
+        if e.message.endswith('takes exactly 2 arguments (1 given)'):
+            r = f(getattr(App, '*app_instance'), event)
+            _log('given function {} is probably inside a class (which should be an App subclass)'.format(repr(f)))
+            return r
+        raise e
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -301,24 +313,53 @@ class Timer(object):
     """
     def __init__(self, callback, interval):
         self.set_callback(callback)
-        self._nsdate = NSDate.date()
-        self._nstimer = NSTimer.alloc().initWithFireDate_interval_target_selector_userInfo_repeats_(
-            self._nsdate, interval, self, 'callback:', None, True)
-        NSRunLoop.currentRunLoop().addTimer_forMode_(self._nstimer, NSDefaultRunLoopMode)
+        self._interval = interval
+        self._status = False
 
     def __call__(self):
         return self._nstimer
 
     def __repr__(self):
-        return '<{}: [started: {}; callback: {}]>'.format(type(self).__name__, repr(self._nsdate),
-                                                          repr(getattr(self, '*callback').__name__))
+        return ('<{}: [callback: {}; interval: {}; '
+                'status: {}]>').format(type(self).__name__, repr(getattr(self, '*callback').__name__),
+                                       self._interval, 'ON' if self._status else 'OFF')
+
+    @property
+    def interval(self):
+        return self._interval  # self._nstimer.timeInterval() when active but could be inactive
+
+    @interval.setter
+    def interval(self, new_interval):
+        if self._status:
+            if abs(self._nsdate.timeIntervalSinceNow()) >= self._nstimer.timeInterval():
+                self.stop()
+                self._interval = new_interval
+                self.start()
+        else:
+            self._interval = new_interval
+
+    @property
+    def callback(self):
+        return getattr(self, '*callback')
+
+    def is_alive(self):
+        return self._status
 
     def start(self):
-        self._nstimer.fire()
+        if not self._status:
+            self._nsdate = NSDate.date()
+            self._nstimer = NSTimer.alloc().initWithFireDate_interval_target_selector_userInfo_repeats_(
+                self._nsdate, self._interval, self, 'callback:', None, True)
+            NSRunLoop.currentRunLoop().addTimer_forMode_(self._nstimer, NSDefaultRunLoopMode)
+            _TIMERS.add(self)
+            self._status = True
 
     def stop(self):
-        self._nstimer.invalidate()
-        delattr(self, 'start')
+        if self._status:
+            self._nstimer.invalidate()
+            del self._nstimer
+            del self._nsdate
+            self._status = False
 
     def set_callback(self, callback):
         setattr(self, '*callback', callback)
@@ -589,10 +630,12 @@ class App(object):
         NSUserNotificationCenter.defaultUserNotificationCenter().setDelegate_(self._nsapp)
 
         setattr(App, '*app_instance', self)  # class level ref to running instance (for passing self to App subclasses)
+        t = b = None
         for t in getattr(timer, '*timers', []):
             t.start()
         for b in getattr(clicked, '*buttons', []):
             b(self)  # we waited on registering clicks so we could pass self to access _menu attribute
+        del t, b
 
         AppHelper.runEventLoop()
         sys.exit(0)

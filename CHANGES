@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.1.2 (2013-08-11)
+------------------
+
+- Interval access and modification added to Timer objects
+- timers function for iterating over timers
+- Timer class now directly in module namespace
+- More specfic case for trying callback with instance of App subclass as first argument
+    - Point is to avoid catching a completely different TypeError, then sending 2 variables to a function consuming 1
+
+
 0.1.1 (2013-08-07)
 ------------------
 
