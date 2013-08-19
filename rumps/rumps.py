@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# rumps: Ridiculously Uncomplicated Mac os x Python statusbar appS.
+# rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
 # Copyright: (c) 2013, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -16,6 +16,7 @@ import weakref
 from collections import OrderedDict, Mapping, Iterable
 
 _TIMERS = weakref.WeakSet()
+separator = object()
 
 
 def debug_mode(choice):
@@ -192,7 +193,67 @@ def _call_as_function_or_method(f, event):
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-class MenuItem(OrderedDict):
+class Menu(OrderedDict):
+    """
+    Wrapper for Objective C's NSMenu. Class implements core functionality of menus in rumps. MenuItem subclasses Menu.
+    """
+    _choose_key = object()
+
+    def __init__(self):
+        self._separators = 1
+        if not hasattr(self, '_menu'):
+            self._menu = NSMenu.alloc().init()
+        super(Menu, self).__init__()
+
+    def __setitem__(self, key, value):
+        if key in self:
+            return
+
+        if value is None:
+            value = separator
+
+        if value is not separator:
+            value = MenuItem(value)  # safely convert if not already MenuItem
+            self._menu.addItem_(value._menuitem)
+            if key is self._choose_key:
+                key = value.title
+        else:
+            value = NSMenuItem.separatorItem()
+            self._menu.addItem_(value)
+            if key is self._choose_key:
+                key = 'separator_' + str(self._separators)
+                self._separators += 1
+
+        if value is not separator and key != value.title:
+            _log('WARNING: key {} is not the same as the title of the corresponding MenuItem {}; while this would '
+                 'occur if the title is dynamically altered, having different names at the time of menu creation may '
+                 'not be desired '.format(repr(key), repr(value.title)))
+
+        super(Menu, self).__setitem__(key, value)
+
+    def __delitem__(self, key):
+        value = self[key]
+        if isinstance(value, MenuItem):
+            value = value._menuitem
+        self._menu.removeItem_(value)
+        super(Menu, self).__delitem__(key)
+
+    def add(self, menuitem):
+        self.__setitem__(self._choose_key, menuitem)
+
+    def clear(self):
+        self._menu.removeAllItems()
+        super(Menu, self).clear()
+
+    def copy(self):
+        raise NotImplementedError
+
+    @classmethod
+    def fromkeys(cls, *args, **kwargs):
+        raise NotImplementedError
+
+
+class MenuItem(Menu):
     """
     Python-Objective-C NSMenuItem -> MenuItem: Encapsulates and abstracts NSMenuItem (and possibly NSMenu as a submenu).
 
@@ -207,46 +268,27 @@ class MenuItem(OrderedDict):
     based on the NSMenuItem (the only argument passed to callback_).
     """
     _ns_to_py_and_callback = {}
-    _choose_key = object()
 
     def __new__(cls, *args, **kwargs):
         if args and isinstance(args[0], cls):  # can safely wrap MenuItem instances
             return args[0]
-        return super(cls, cls).__new__(cls, *args, **kwargs)
+        return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, title, callback=None, key='', icon=None, dimensions=None):
-        if isinstance(title, type(self)):  # don't initialize already existing instances
+        if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(str(title), None, '')
         if callable(callback):
             self.set_callback(callback, key)
-        self._submenu = self._icon = None
+        self._menu = self._icon = None
         self.set_icon(icon, dimensions)
         super(MenuItem, self).__init__()
 
     def __setitem__(self, key, value):
-        if key in self:
-            return
-
-        value = MenuItem(value)  # safely convert if not already MenuItem
-        if key is self._choose_key:
-            key = value.title
-        assert key == value.title, ('key {} needs to be the same as the title of the '
-                                    'MenuItem {}').format(repr(key), repr(value.title))
-
-        if self._submenu is None:
-            self._submenu = NSMenu.alloc().init()
-            self._menuitem.setSubmenu_(self._submenu)
-
-        self._submenu.addItem_(value._menuitem)
+        if self._menu is None:
+            self._menu = NSMenu.alloc().init()
+            self._menuitem.setSubmenu_(self._menu)
         super(MenuItem, self).__setitem__(key, value)
-
-    def __delitem__(self, key):
-        self._submenu.removeItem_(self[key]._menuitem)
-        super(MenuItem, self).__delitem__(key)
-
-    def __call__(self):
-        return self._menuitem
 
     def __repr__(self):
         try:
@@ -255,9 +297,6 @@ class MenuItem(OrderedDict):
             callback = None
         return '<{}: [{} -> {}; callback: {}]>'.format(type(self).__name__, repr(self.title), map(str, self),
                                                        repr(callback))
-
-    def add(self, menuitem):
-        self.__setitem__(self._choose_key, menuitem)
 
     @property
     def title(self):
@@ -476,9 +515,6 @@ class NSApp(NSObject):
     """
     Objective C delegate class for NSApplication. Don't instantiate - use App instead.
     """
-    #def applicationDidFinishLaunching_(self, _):
-    #    self.initializeStatusBar()
-
     def userNotificationCenter_didActivateNotification_(self, notification_center, notification):
         notification_center.removeDeliveredNotification_(notification)
         data = dict(notification.userInfo())
@@ -489,14 +525,8 @@ class NSApp(NSObject):
                  'decorator to register a function.')
 
     def initializeStatusBar(self):
-        _log(self)
         self.nsstatusitem = NSStatusBar.systemStatusBar().statusItemWithLength_(-1)  # variable dimensions
         self.nsstatusitem.setHighlightMode_(True)
-        self.mainmenu = NSMenu.alloc().init()
-        self.nsstatusitem.setMenu_(self.mainmenu)  # mainmenu of our status bar spot
-        self.quit = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_('Quit', 'terminate:', '')
-
-        _log(self.mainmenu)
 
         if self._app['_icon'] is not None:
             self.setStatusBarIcon()
@@ -506,10 +536,10 @@ class NSApp(NSObject):
         else:
             self.setStatusBarTitle()
 
-        if self._app['_menu'] is not None:
-            for item in self._app['_menu'].itervalues():
-                self.mainmenu.addItem_(item())  # calling works for separators and getting NSMenuItem from MenuItem objs
-        self.mainmenu.addItem_(self.quit)
+        mainmenu = self._app['_menu']
+        mainmenu.add('Quit')
+        mainmenu['Quit']._menuitem.setAction_('terminate:')  # _menuitem attribute is NSMenuItem
+        self.nsstatusitem.setMenu_(mainmenu._menu)  # mainmenu of our status bar spot (_menu attribute is NSMenu)
 
     def setStatusBarTitle(self):
         self.nsstatusitem.setTitle_(self._app['_title'] if self._app['_title'] is not None else self._app['_name'])
@@ -580,33 +610,28 @@ class App(object):
             """
             for n, ele in enumerate(iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
 
-                # None -> visual separator
-                if ele is None:
-                    sep = NSMenuItem.separatorItem
-                    menu[str(id(sep))] = sep
-
-                # menu item
-                elif isinstance(ele, (basestring, MenuItem)) or not isinstance(ele, Iterable):
-                    ele = MenuItem(ele)    # >>>
-                    menu[ele.title] = ele  # TODO: menu.add(ele) --> need to deal with top-level add method
-
                 # for mappings we recurse but don't drop down a level in the menu
-                elif isinstance(ele, Mapping):
+                if not isinstance(ele, MenuItem) and isinstance(ele, Mapping):
                     parse_menu(ele, menu)
 
-                # any other iterables need to be of length 2
-                else:
+                # any iterables other than strings and MenuItems
+                elif not isinstance(ele, (basestring, MenuItem)) and isinstance(ele, Iterable):
                     ele = tuple(ele)
                     if len(ele) != 2:
-                        raise ValueError('menu iterable element #{} has length {}; must be a single menu item or a pair '
-                                         'consisting of a menu item and its submenu'.format(n, len(ele)))
-                    ele, submenu = ele
-                    ele = MenuItem(ele)    # >>>
-                    menu[ele.title] = ele  # TODO: menu.add(ele) --> need to deal with top-level add method
-                    parse_menu(submenu, ele)
+                        raise ValueError('menu iterable element #{} has length {}; must be a single menu item or a '
+                                         'pair consisting of a menu item and its submenu'.format(n, len(ele)))
+                    menuitem, submenu = ele
+                    menuitem = MenuItem(menuitem)
+                    menu.add(menuitem)
+                    parse_menu(submenu, menuitem)
+
+                # menu item
+                else:
+                    menu.add(ele)
             return menu
-        obj_c_menu = OrderedDict()  # mainmenu -> NSMenu, directly off of status bar
-        self._menu = None if python_menu is None else parse_menu(python_menu, obj_c_menu)
+        if python_menu is not None:
+            obj_c_menu = Menu()  # mainmenu -> NSMenu, directly off of status bar
+            self._menu = parse_menu(python_menu, obj_c_menu)
 
     # Open files in application support folder
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,7 +1,7 @@
 rumps
 =====
 
-**R**idiculously **U**ncomplicated **M**ac os x **P**ython statusbar app<strong>S</strong>.
+**R**idiculously **U**ncomplicated **M**ac os x **P**ython **S**tatusbar apps.
 
 ![pic](https://raw.github.com/jaredks/rumps/master/examples/rumps_example.png)
 

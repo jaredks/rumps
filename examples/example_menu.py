@@ -12,10 +12,12 @@ def adjust_f(sender):
         sender.add('$')
         sender.add('%')
         sender['zzz'] = 'zzz'
+        sender['separator'] = separator
         sender['ppp'] = MenuItem('ppp')
     else:
         del sender['$']
         del sender['%']
+        del sender['separator']
         del sender['ppp']
     adjust_f.huh = not adjust_f.huh
 adjust_f.huh = True
@@ -41,6 +43,17 @@ app.menu = [
         'y': ['what is up']
     },
     [1, [2]],
+    ('update method', ['walking', 'back', 'to', 'you']),
     None
 ]
+
+@clicked('update method')
+def dict_update(menu):
+    print menu
+    print menu.setdefault('boo', MenuItem('boo',
+                                          callback=lambda _: add_separator(menu)))  # lambda gets THIS menu not submenu
+
+def add_separator(menu):
+    menu.add(separator)
+
 app.run()

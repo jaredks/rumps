@@ -1,6 +1,22 @@
 Changes
 =======
 
+0.1.3 (2013-08-19)
+------------------
+
+- `separator` global for marking menu separators (in addition to None in context of a menu)
+- Can now have separators in sub menus using either `separator` or None
+- Key and menu title not matching doesn't raise an exception since the situation would occur if the title is changed
+  dynamically
+    - Instead, a warning in the log
+- Refactored MenuItem such that it subclasses new Menu class
+- Menu class created
+    - Wraps NSMenu using __setitem__, __delitem__, etc.
+    - Allows for main menu to be easily changed during runtime as it now uses Menu class instead of vanilla OrderedDict
+    - `clear` method for MenuItem + other irrelevant methods inherited from OrderedDict raise NotImplementedError
+- As result of refactoring, could simplify menu parsing for App
+
+
 0.1.2 (2013-08-11)
 ------------------
 

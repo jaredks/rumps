@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# rumps: Ridiculously Uncomplicated Mac os x Python statusbar appS.
+# rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
 # Copyright: (c) 2013, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 """
-rumps: Ridiculously Uncomplicated Mac os x Python statusbar appS.
+rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
 
 Classes:
 App(name[, title[, icon[, menu]]]) --> App object representing your application
@@ -32,10 +32,10 @@ debug_mode(choice) --> Runs the application in debug mode with verbose output if
 """
 
 __title__ = 'rumps'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 __author__ = 'Jared Suttles'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2013 Jared Suttles'
 
-from .rumps import (debug_mode, alert, notification, application_support, timers, timer, clicked, notifications,
-                    MenuItem, Timer, Window, App)
+from .rumps import (separator, debug_mode, alert, notification, application_support, timers, timer, clicked,
+                    notifications, MenuItem, Timer, Window, App)

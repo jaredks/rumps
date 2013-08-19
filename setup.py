@@ -5,7 +5,7 @@ import rumps
 setup(
     name='rumps',
     version=rumps.__version__,
-    description='Ridiculously Uncomplicated Mac os x Python toolbar appS',
+    description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',
     packages=['rumps'],
