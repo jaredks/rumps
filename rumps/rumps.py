@@ -334,8 +334,8 @@ class MenuItem(Menu):
 
     def set_callback(self, callback, key=''):
         self._ns_to_py_and_callback[self._menuitem] = self, callback
-        self._menuitem.setTarget_(type(self))
         self._menuitem.setAction_('callback:')
+        self._menuitem.setTarget_(type(self))
         self._menuitem.setKeyEquivalent_(key)
 
     @classmethod
@@ -559,7 +559,8 @@ class App(object):
         self._icon = self._title = self._menu = None
         self.icon = icon
         self.title = title
-        self.menu = menu
+        if menu:
+            self.menu = menu
         self._application_support = application_support(self._name)
 
     # Properties
@@ -625,13 +626,12 @@ class App(object):
                     menu.add(menuitem)
                     parse_menu(submenu, menuitem)
 
-                # menu item
+                # menu item / could be visual separator where ele is None or separator
                 else:
                     menu.add(ele)
             return menu
-        if python_menu is not None:
-            obj_c_menu = Menu()  # mainmenu -> NSMenu, directly off of status bar
-            self._menu = parse_menu(python_menu, obj_c_menu)
+        mainmenu = Menu()  # menu directly off of status bar
+        self._menu = parse_menu(python_menu, mainmenu)
 
     # Open files in application support folder
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

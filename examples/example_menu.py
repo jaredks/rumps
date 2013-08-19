@@ -56,4 +56,10 @@ def dict_update(menu):
 def add_separator(menu):
     menu.add(separator)
 
+@clicked('C')
+def change_main_menu(_):
+    print app.menu
+    print 'goodbye C'
+    del app.menu['C']  # DELETE SELF!!!1
+
 app.run()
