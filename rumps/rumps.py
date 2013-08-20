@@ -218,17 +218,16 @@ class Menu(ListDict):
             self._menu.addItem_(value._menuitem)
             if key is self._choose_key:
                 key = value.title
+            if key != value.title:
+                _log('WARNING: key {} is not the same as the title of the corresponding MenuItem {}; while this would '
+                     'occur if the title is dynamically altered, having different names at the time of menu creation '
+                     'may not be desired '.format(repr(key), repr(value.title)))
         else:
             value = NSMenuItem.separatorItem()
             self._menu.addItem_(value)
             if key is self._choose_key:
                 key = 'separator_' + str(self._separators)
                 self._separators += 1
-
-        if value is not separator and key != value.title:
-            _log('WARNING: key {} is not the same as the title of the corresponding MenuItem {}; while this would '
-                 'occur if the title is dynamically altered, having different names at the time of menu creation may '
-                 'not be desired '.format(repr(key), repr(value.title)))
 
         super(Menu, self).__setitem__(key, value)
 
@@ -253,18 +252,53 @@ class Menu(ListDict):
     def fromkeys(cls, *args, **kwargs):
         raise NotImplementedError
 
+    def update(self, iterable, **kwargs):
+        """
+        This update is a bit different from the usual dict update method. It works recursively and will parse a
+        variety of Python containers, creating menus as necessary.
+
+        Keys of corresponding MenuItems in the Menu dictionary are the title of those MenuItems at the time of parsing.
+        """
+        def parse_menu(iterable, menu, depth):
+            if isinstance(iterable, MenuItem):
+                menu.add(iterable)
+                return
+
+            for n, ele in enumerate(iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
+
+                # for mappings we recurse but don't drop down a level in the menu
+                if not isinstance(ele, MenuItem) and isinstance(ele, Mapping):
+                    parse_menu(ele, menu, depth)
+
+                # any iterables other than strings and MenuItems
+                elif not isinstance(ele, (basestring, MenuItem)) and isinstance(ele, Iterable):
+                    try:
+                        menuitem, submenu = ele
+                    except TypeError:
+                        raise ValueError('menu iterable element #{} at depth {} has length {}; must be a single '
+                                         'menu item or a pair consisting of a menu item and its '
+                                         'submenu'.format(n, depth, len(tuple(ele))))
+                    menuitem = MenuItem(menuitem)
+                    menu.add(menuitem)
+                    parse_menu(submenu, menuitem, depth+1)
+
+                # menu item / could be visual separator where ele is None or separator
+                else:
+                    menu.add(ele)
+        parse_menu(iterable, self, 0)
+        parse_menu(kwargs, self, 0)
+
     # ListDict insertion methods
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def insert_after(self, existing_key, key_value):
         key, value = self._make_menuitem(key_value)
-
         existing_value = self[existing_key]
-        if existing_key == key:
+
+        if existing_key == key:  # this would mess stuff up...
             raise ValueError('same key provided for location and insertion')
 
         # Objective C
-        value = MenuItem(value)
         index = self._menu.indexOfItem_(existing_value._menuitem)
         self._menu.insertItem_atIndex_(value._menuitem, index + 1)
 
@@ -590,10 +624,11 @@ class App(object):
     """
     def __init__(self, name, title=None, icon=None, menu=None):
         self._name = str(name)
-        self._icon = self._title = self._menu = None
+        self._icon = self._title = None
         self.icon = icon
         self.title = title
-        if menu:
+        self._menu = Menu()
+        if menu is not None:
             self.menu = menu
         self._application_support = application_support(self._name)
 
@@ -637,35 +672,8 @@ class App(object):
         return self._menu
 
     @menu.setter
-    def menu(self, python_menu):
-        def parse_menu(iterable, menu=None):
-            """
-            Recursive parser for turning beautiful Python data types into a steaming pile of convoluted OrderedDict
-            subclass instances with NSBlah instance attributes... But we hide that from end-developers!
-            """
-            for n, ele in enumerate(iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
-
-                # for mappings we recurse but don't drop down a level in the menu
-                if not isinstance(ele, MenuItem) and isinstance(ele, Mapping):
-                    parse_menu(ele, menu)
-
-                # any iterables other than strings and MenuItems
-                elif not isinstance(ele, (basestring, MenuItem)) and isinstance(ele, Iterable):
-                    ele = tuple(ele)
-                    if len(ele) != 2:
-                        raise ValueError('menu iterable element #{} has length {}; must be a single menu item or a '
-                                         'pair consisting of a menu item and its submenu'.format(n, len(ele)))
-                    menuitem, submenu = ele
-                    menuitem = MenuItem(menuitem)
-                    menu.add(menuitem)
-                    parse_menu(submenu, menuitem)
-
-                # menu item / could be visual separator where ele is None or separator
-                else:
-                    menu.add(ele)
-            return menu
-        mainmenu = Menu()  # menu directly off of status bar
-        self._menu = parse_menu(python_menu, mainmenu)
+    def menu(self, iterable):
+        self._menu.update(iterable)
 
     # Open files in application support folder
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
