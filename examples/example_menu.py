@@ -44,6 +44,7 @@ app.menu = [
     },
     [1, [2]],
     ('update method', ['walking', 'back', 'to', 'you']),
+    'stuff',
     None
 ]
 
@@ -61,5 +62,14 @@ def change_main_menu(_):
     print app.menu
     print 'goodbye C'
     del app.menu['C']  # DELETE SELF!!!1
+
+@clicked('stuff')
+def stuff(sender):
+    print sender
+    if len(sender):
+        sender.insert_after('lets', 'go?')
+    else:
+        sender.update([('hey', 'hey'), ('ho', 'ho'), ('lets', 'lets'), ('teenage', 'teenage')])
+        sender.add('waste land')
 
 app.run()

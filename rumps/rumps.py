@@ -13,7 +13,8 @@ from PyObjCTools import AppHelper
 import os
 import sys
 import weakref
-from collections import OrderedDict, Mapping, Iterable
+from collections import Mapping, Iterable
+from .utils import ListDict
 
 _TIMERS = weakref.WeakSet()
 separator = object()
@@ -193,7 +194,7 @@ def _call_as_function_or_method(f, event):
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-class Menu(OrderedDict):
+class Menu(ListDict):
     """
     Wrapper for Objective C's NSMenu. Class implements core functionality of menus in rumps. MenuItem subclasses Menu.
     """
@@ -251,6 +252,39 @@ class Menu(OrderedDict):
     @classmethod
     def fromkeys(cls, *args, **kwargs):
         raise NotImplementedError
+
+    # ListDict insertion methods
+    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def insert_after(self, existing_key, key_value):
+        key, value = self._make_menuitem(key_value)
+
+        existing_value = self[existing_key]
+        if existing_key == key:
+            raise ValueError('same key provided for location and insertion')
+
+        # Objective C
+        value = MenuItem(value)
+        index = self._menu.indexOfItem_(existing_value._menuitem)
+        self._menu.insertItem_atIndex_(value._menuitem, index + 1)
+
+        super(Menu, self).insert_after(existing_key, (key, value))
+
+    def insert_before(self, existing_key, key_value):
+        raise NotImplementedError  # to come!
+
+    # Helpers
+    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def _make_menuitem(self, key_value):
+        if not isinstance(key_value, basestring):
+            try:
+                key, value = key_value
+                return key, MenuItem(value)
+            except TypeError:
+                pass
+        value = MenuItem(key_value)
+        return value.title, value
 
 
 class MenuItem(Menu):
