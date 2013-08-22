@@ -207,35 +207,14 @@ class Menu(ListDict):
         super(Menu, self).__init__()
 
     def __setitem__(self, key, value):
-        if key in self:
-            return
-
-        if value is None:
-            value = separator
-
-        if value is not separator:
-            value = MenuItem(value)  # safely convert if not already MenuItem
+        if key not in self:
+            key, value = self._process_new_menuitem(key, value)
             self._menu.addItem_(value._menuitem)
-            if key is self._choose_key:
-                key = value.title
-            if key != value.title:
-                _log('WARNING: key {} is not the same as the title of the corresponding MenuItem {}; while this would '
-                     'occur if the title is dynamically altered, having different names at the time of menu creation '
-                     'may not be desired '.format(repr(key), repr(value.title)))
-        else:
-            value = NSMenuItem.separatorItem()
-            self._menu.addItem_(value)
-            if key is self._choose_key:
-                key = 'separator_' + str(self._separators)
-                self._separators += 1
-
-        super(Menu, self).__setitem__(key, value)
+            super(Menu, self).__setitem__(key, value)
 
     def __delitem__(self, key):
         value = self[key]
-        if isinstance(value, MenuItem):
-            value = value._menuitem
-        self._menu.removeItem_(value)
+        self._menu.removeItem_(value._menuitem)
         super(Menu, self).__delitem__(key)
 
     def add(self, menuitem):
@@ -291,34 +270,45 @@ class Menu(ListDict):
     # ListDict insertion methods
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def insert_after(self, existing_key, key_value):
-        key, value = self._make_menuitem(key_value)
-        existing_value = self[existing_key]
+    def insert_after(self, existing_key, menuitem):
+        key, menuitem = self._process_new_menuitem(self._choose_key, menuitem)
+        self._insert_helper(existing_key, key, menuitem, 1)
+        super(Menu, self).insert_after(existing_key, (key, menuitem))
 
+    def insert_before(self, existing_key, menuitem):
+        key, menuitem = self._process_new_menuitem(self._choose_key, menuitem)
+        self._insert_helper(existing_key, key, menuitem, 0)
+        super(Menu, self).insert_before(existing_key, (key, menuitem))
+
+    def _insert_helper(self, existing_key, key, menuitem, pos):
         if existing_key == key:  # this would mess stuff up...
             raise ValueError('same key provided for location and insertion')
+        existing_menuitem = self[existing_key]
+        index = self._menu.indexOfItem_(existing_menuitem._menuitem)
+        self._menu.insertItem_atIndex_(menuitem._menuitem, index + pos)
 
-        # Objective C
-        index = self._menu.indexOfItem_(existing_value._menuitem)
-        self._menu.insertItem_atIndex_(value._menuitem, index + 1)
-
-        super(Menu, self).insert_after(existing_key, (key, value))
-
-    def insert_before(self, existing_key, key_value):
-        raise NotImplementedError  # to come!
-
-    # Helpers
+    # Processing MenuItems
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def _make_menuitem(self, key_value):
-        if not isinstance(key_value, basestring):
-            try:
-                key, value = key_value
-                return key, MenuItem(value)
-            except TypeError:
-                pass
-        value = MenuItem(key_value)
-        return value.title, value
+    def _process_new_menuitem(self, key, value):
+        if value is None:
+            value = separator
+
+        if value is not separator:
+            value = MenuItem(value)  # safely convert if not already MenuItem
+            if key is self._choose_key:
+                key = value.title
+            if key != value.title:
+                _log('WARNING: key {} is not the same as the title of the corresponding MenuItem {}; while this would '
+                     'occur if the title is dynamically altered, having different names at the time of menu creation '
+                     'may not be desired '.format(repr(key), repr(value.title)))
+        else:
+            value = SeparatorMenuItem()
+            if key is self._choose_key:
+                key = 'separator_' + str(self._separators)
+                self._separators += 1
+
+        return key, value
 
 
 class MenuItem(Menu):
@@ -338,7 +328,7 @@ class MenuItem(Menu):
     _ns_to_py_and_callback = {}
 
     def __new__(cls, *args, **kwargs):
-        if args and isinstance(args[0], cls):  # can safely wrap MenuItem instances
+        if args and isinstance(args[0], MenuItem):  # can safely wrap MenuItem instances
             return args[0]
         return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
@@ -411,6 +401,11 @@ class MenuItem(Menu):
         self, callback = cls._ns_to_py_and_callback[nsmenuitem]
         _log(self)
         return _call_as_function_or_method(callback, self)
+
+
+class SeparatorMenuItem(object):
+    def __init__(self):
+        self._menuitem = NSMenuItem.separatorItem()
 
 
 class Timer(object):

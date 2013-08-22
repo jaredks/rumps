@@ -5,12 +5,12 @@
 # Copyright: (c) 2013, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-import collections
+from collections import OrderedDict as _OrderedDict
 
 
 # ListDict: OrderedDict subclass with insertion methods for modifying the order of the linked list in O(1) time
 # https://gist.github.com/jaredks/6276032
-class ListDict(collections.OrderedDict):
+class ListDict(_OrderedDict):
     def __insertion(self, link_prev, key_value):
         key, value = key_value
         if link_prev[2] != key:

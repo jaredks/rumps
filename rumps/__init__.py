@@ -32,7 +32,7 @@ debug_mode(choice) --> Runs the application in debug mode with verbose output if
 """
 
 __title__ = 'rumps'
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __author__ = 'Jared Suttles'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2013 Jared Suttles'

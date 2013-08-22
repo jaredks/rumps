@@ -68,6 +68,8 @@ def stuff(sender):
     print sender
     if len(sender):
         sender.insert_after('lets', 'go?')
+        sender['the'].insert_before('band', 'not')
+        sender['the'].insert_before('band', 'a')
     else:
         sender.update(['hey', ['ho', MenuItem('HOOOO')], 'lets', 'teenage'], the=['who', 'is', 'band'])
         sender.add('waste land')
