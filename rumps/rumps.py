@@ -618,7 +618,7 @@ class App(object):
     way.
     """
     def __init__(self, name, title=None, icon=None, menu=None):
-        self._name = str(name)
+        self._name = unicode(name)
         self._icon = self._title = None
         self.icon = icon
         self.title = title
