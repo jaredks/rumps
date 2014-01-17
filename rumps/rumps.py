@@ -311,6 +311,23 @@ class Menu(ListDict):
         return key, value
 
 
+class MenuItemCallbackHolder(NSObject):
+
+    _instance = None
+    _ns_to_py_and_callback = {}
+
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls.alloc().init()
+        return cls._instance
+
+    def callback_(self, nsmenuitem):
+        iteminstance, callback = self._ns_to_py_and_callback[nsmenuitem]
+        _log(iteminstance)
+        return _call_as_function_or_method(callback, iteminstance)
+
+
 class MenuItem(Menu):
     """
     Python-Objective-C NSMenuItem -> MenuItem: Encapsulates and abstracts NSMenuItem (and possibly NSMenu as a submenu).
@@ -325,7 +342,6 @@ class MenuItem(Menu):
     decorated with @clicked(...). All we do is lookup the MenuItem instance and the user-provided callback function
     based on the NSMenuItem (the only argument passed to callback_).
     """
-    _ns_to_py_and_callback = {}
 
     def __new__(cls, *args, **kwargs):
         if args and isinstance(args[0], MenuItem):  # can safely wrap MenuItem instances
@@ -335,6 +351,7 @@ class MenuItem(Menu):
     def __init__(self, title, callback=None, key='', icon=None, dimensions=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
+        self._holder = MenuItemCallbackHolder.instance()
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(str(title), None, '')
         if callable(callback):
             self.set_callback(callback, key)
@@ -350,7 +367,7 @@ class MenuItem(Menu):
 
     def __repr__(self):
         try:
-            callback = self._ns_to_py_and_callback[self._menuitem][1]
+            callback = MenuItemCallbackHolder._ns_to_py_and_callback[self._menuitem][1]
         except KeyError:
             callback = None
         return '<{}: [{} -> {}; callback: {}]>'.format(type(self).__name__, repr(self.title), map(str, self),
@@ -391,16 +408,10 @@ class MenuItem(Menu):
         self._menuitem.setState_(new_state)
 
     def set_callback(self, callback, key=''):
-        self._ns_to_py_and_callback[self._menuitem] = self, callback
+        MenuItemCallbackHolder._ns_to_py_and_callback[self._menuitem] = self, callback
         self._menuitem.setAction_('callback:')
-        self._menuitem.setTarget_(type(self))
+        self._menuitem.setTarget_(self._holder)
         self._menuitem.setKeyEquivalent_(key)
-
-    @classmethod
-    def callback_(cls, nsmenuitem):
-        self, callback = cls._ns_to_py_and_callback[nsmenuitem]
-        _log(self)
-        return _call_as_function_or_method(callback, self)
 
 
 class SeparatorMenuItem(object):
