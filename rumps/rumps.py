@@ -49,8 +49,8 @@ def alert(title, message='', ok=None, cancel=False):
     """
     Simple alert window.
     """
-    message = str(message)
-    title = str(title)
+    message = unicode(message)
+    title = unicode(title)
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
         title, ok, 'Cancel' if cancel else None, None, message)
     alert.setAlertStyle_(0)  # informational style
@@ -335,7 +335,7 @@ class MenuItem(Menu):
     def __init__(self, title, callback=None, key='', icon=None, dimensions=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
-        self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(str(title), None, '')
+        self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(unicode(title), None, '')
         if callable(callback):
             self.set_callback(callback, key)
         self._menu = self._icon = None
@@ -362,7 +362,7 @@ class MenuItem(Menu):
 
     @title.setter
     def title(self, new_title):
-        new_title = str(new_title)
+        new_title = unicode(new_title)
         self._menuitem.setTitle_(new_title)
 
     @property
@@ -476,8 +476,8 @@ class Window(object):
     Window class for consuming user input.
     """
     def __init__(self, message, title='', default_text='', ok=None, cancel=False, dimensions=(320, 160)):
-        message = str(message)
-        title = str(title)
+        message = unicode(message)
+        title = unicode(title)
         self._default_text = default_text
         self._cancel = bool(cancel)
         self._icon = None
@@ -498,7 +498,7 @@ class Window(object):
 
     @title.setter
     def title(self, new_title):
-        new_title = str(new_title)
+        new_title = unicode(new_title)
         self._alert.setMessageText_(new_title)
 
     @property
@@ -507,7 +507,7 @@ class Window(object):
 
     @message.setter
     def message(self, new_message):
-        new_message = str(new_message)
+        new_message = unicode(new_message)
         self._alert.setInformativeText_(new_message)
 
     @property
@@ -516,7 +516,7 @@ class Window(object):
 
     @default_text.setter
     def default_text(self, new_text):
-        new_text = str(new_text)
+        new_text = unicode(new_text)
         self._default_text = new_text
         self._textfield.setStringValue_(new_text)
 
@@ -531,7 +531,7 @@ class Window(object):
         self._alert.setIcon_(new_icon)
 
     def add_button(self, name):
-        name = str(name)
+        name = unicode(name)
         self._alert.addButtonWithTitle_(name)
 
     def add_buttons(self, iterable=None, *args):
@@ -642,7 +642,7 @@ class App(object):
     def title(self, title):
         if title is None:
             return
-        self._title = str(title)
+        self._title = unicode(title)
         try:
             self._nsapp.setStatusBarTitle()
         except AttributeError:
