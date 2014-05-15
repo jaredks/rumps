@@ -392,7 +392,10 @@ class MenuItem(Menu):
 
     def set_callback(self, callback, key=''):
         self._ns_to_py_and_callback[self._menuitem] = self, callback
-        self._menuitem.setAction_('callback:')
+        if callback is None:
+            self._menuitem.setAction_(None)
+        else:
+            self._menuitem.setAction_('callback:')
         self._menuitem.setTarget_(type(self))
         self._menuitem.setKeyEquivalent_(key)
 
