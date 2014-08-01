@@ -12,6 +12,7 @@ setup(
     package_data={'': ['LICENSE']},
     long_description=open('README.md').read() + '\n\n' + open('CHANGES').read(),
     license='BSD License',
+    install_requires=['pyobjc-core'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: MacOS X',
