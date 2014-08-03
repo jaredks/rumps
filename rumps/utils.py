@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
-# Copyright: (c) 2013, Jared Suttles. All rights reserved.
+# Copyright: (c) 2014, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 from collections import OrderedDict as _OrderedDict

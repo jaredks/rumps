@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
-# Copyright: (c) 2013, Jared Suttles. All rights reserved.
+# Copyright: (c) 2014, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 from Foundation import (NSUserNotification, NSUserNotificationCenter, NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode,
@@ -317,9 +317,9 @@ class MenuItem(Menu):
 
     OrderedDict subclassing enables remembering order of items added to menu and has constant time lookup.
 
-    Because of the quirks of PyObjC, a class level dictionary is required in order to have callback_ be a @classmethod.
-    And we need callback_ to be class level because we can't use instances of MenuItem in setTarget_ method of
-    NSMenuItem. Otherwise this would be much more straightfoward like Timer class.
+    Because of the quirks of PyObjC, a class level dictionary **inside an NSObject subclass for 10.9.x** is required in
+    order to have callback_ be a @classmethod. And we need callback_ to be class level because we can't use instances
+    in setTarget_ method of NSMenuItem. Otherwise this would be much more straightfoward like Timer class.
 
     So the target is always the MenuItem class and action is always the @classmethod callback_ -- for every function
     decorated with @clicked(...). All we do is lookup the MenuItem instance and the user-provided callback function

@@ -1,7 +1,7 @@
 rumps
 =====
 
-**R**idiculously **U**ncomplicated **M**ac os x **P**ython **S**tatusbar apps.
+<b>R</b>idiculously <b>U</b>ncomplicated <b>M</b>ac os x <b>P</b>ython <b>S</b>tatusbar apps.
 
 ![pic](https://raw.github.com/jaredks/rumps/master/examples/rumps_example.png)
 
@@ -100,4 +100,4 @@ Installation
 License
 -------
 
-"Modified BSD License". See LICENSE for details. Copyright Jared Suttles, 2013.
+"Modified BSD License". See LICENSE for details. Copyright Jared Suttles, 2014.

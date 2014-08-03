@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.1.5 (2014-08-03)
+------------------
+
+- Fix implemented for NSInvalidArgumentException issue on 10.9.x
+
+
 0.1.4 (2013-08-21)
 ------------------
 
