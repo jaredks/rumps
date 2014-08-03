@@ -325,8 +325,6 @@ class MenuItem(Menu):
     decorated with @clicked(...). All we do is lookup the MenuItem instance and the user-provided callback function
     based on the NSMenuItem (the only argument passed to callback_).
     """
-    _ns_to_py_and_callback = {}
-
     def __new__(cls, *args, **kwargs):
         if args and isinstance(args[0], MenuItem):  # can safely wrap MenuItem instances
             return args[0]
@@ -350,7 +348,7 @@ class MenuItem(Menu):
 
     def __repr__(self):
         try:
-            callback = self._ns_to_py_and_callback[self._menuitem][1]
+            callback = NSApp._ns_to_py_and_callback[self._menuitem][1]
         except KeyError:
             callback = None
         return '<{}: [{} -> {}; callback: {}]>'.format(type(self).__name__, repr(self.title), map(str, self),
@@ -391,16 +389,10 @@ class MenuItem(Menu):
         self._menuitem.setState_(new_state)
 
     def set_callback(self, callback, key=''):
-        self._ns_to_py_and_callback[self._menuitem] = self, callback
+        NSApp._ns_to_py_and_callback[self._menuitem] = self, callback
+        self._menuitem.setTarget_(NSApp)
         self._menuitem.setAction_('callback:')
-        self._menuitem.setTarget_(type(self))
         self._menuitem.setKeyEquivalent_(key)
-
-    @classmethod
-    def callback_(cls, nsmenuitem):
-        self, callback = cls._ns_to_py_and_callback[nsmenuitem]
-        _log(self)
-        return _call_as_function_or_method(callback, self)
 
 
 class SeparatorMenuItem(object):
@@ -578,6 +570,8 @@ class NSApp(NSObject):
     """
     Objective C delegate class for NSApplication. Don't instantiate - use App instead.
     """
+    _ns_to_py_and_callback = {}
+
     def userNotificationCenter_didActivateNotification_(self, notification_center, notification):
         notification_center.removeDeliveredNotification_(notification)
         data = dict(notification.userInfo())
@@ -609,6 +603,12 @@ class NSApp(NSObject):
 
     def setStatusBarIcon(self):
         self.nsstatusitem.setImage_(_nsimage_from_file(self._app['_icon']))
+
+    @classmethod
+    def callback_(cls, nsmenuitem):
+        self, callback = cls._ns_to_py_and_callback[nsmenuitem]
+        _log(self)
+        return _call_as_function_or_method(callback, self)
 
 
 class App(object):
