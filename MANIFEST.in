@@ -1,2 +1,2 @@
-include README.md
-include CHANGES
+include README.rst
+include CHANGES.rst

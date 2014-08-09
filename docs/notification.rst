@@ -1,0 +1,4 @@
+notification
+============
+
+.. autofunction:: rumps.notification

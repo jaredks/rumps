@@ -2,15 +2,20 @@
 from distutils.core import setup
 import rumps
 
+with open('README.rst') as f:
+    readme = f.read()
+with open('CHANGES.rst') as f:
+    changes = f.read()
+
 setup(
     name='rumps',
     version=rumps.__version__,
     description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',
-    packages=['rumps'],
+    packages=['rumps', 'rumps.packages'],
     package_data={'': ['LICENSE']},
-    long_description=open('README.md').read() + '\n\n' + open('CHANGES').read(),
+    long_description=readme + '\n\n' + changes,
     license='BSD License',
     install_requires=['pyobjc-core'],
     classifiers=[

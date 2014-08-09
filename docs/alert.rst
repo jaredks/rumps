@@ -1,0 +1,4 @@
+alert
+=====
+
+.. autofunction:: rumps.alert

@@ -1,0 +1,4 @@
+clicked
+=======
+
+.. autofunction:: rumps.clicked
