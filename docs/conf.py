@@ -15,6 +15,17 @@
 import sys
 import os
 
+class Mock(object):
+    def __init__(self, *_):
+        pass
+
+    @classmethod
+    def __getattr__(cls, _):
+        return cls()
+
+modules = ['Foundation', 'AppKit', 'PyObjCTools']
+sys.modules.update((module, Mock()) for module in modules)
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
