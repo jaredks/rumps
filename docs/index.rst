@@ -8,7 +8,7 @@ Welcome to rumps
 
 rumps is...
 
-Ridiculously Uncomplicated Mac os x Python Statusbar apps!
+Ridiculously Uncomplicated OS X Python Statusbar apps!
 
 rumps exposes Objective-C classes as Python classes and functions which greatly simplifies the process of creating a statusbar application.
 
