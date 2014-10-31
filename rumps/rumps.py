@@ -7,6 +7,12 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 _NOTIFICATIONS = True
+
+# For compatibility with pyinstaller
+# See: http://stackoverflow.com/questions/21058889/pyinstaller-not-finding-pyobjc-library-macos-python
+import Foundation
+import AppKit
+
 try:
     from Foundation import NSUserNotification, NSUserNotificationCenter
 except ImportError:
