@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from distutils.core import setup
-import rumps
 
 with open('README.rst') as f:
     readme = f.read()
@@ -9,7 +8,7 @@ with open('CHANGES.rst') as f:
 
 setup(
     name='rumps',
-    version=rumps.__version__,
+    version='0.2.1',
     description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',

@@ -18,7 +18,6 @@ from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTe
 from PyObjCTools import AppHelper
 
 import os
-import sys
 import weakref
 from collections import Mapping, Iterable
 from .utils import ListDict
@@ -110,8 +109,8 @@ def application_support(name):
 
 
 def timers():
-    """Return a list of weak references to :class:`rumps.Timer` objects. These can be active or inactive."""
-    return _TIMERS.keyrefs()
+    """Return a list of all :class:`rumps.Timer` objects. These can be active or inactive."""
+    return list(_TIMERS)
 
 
 def quit_application(sender=None):
@@ -177,11 +176,14 @@ def timer(interval):
     return decorator
 
 
-def clicked(*args):
+def clicked(*args, **options):
     """Decorator for registering a function as a callback for a click action on a :class:`rumps.MenuItem` within the
     application. The passed `args` must specify an existing path in the main menu. The :class:`rumps.MenuItem`
     instance at the end of that path will have its :meth:`rumps.MenuItem.set_callback` method called, passing in the
     decorated function.
+
+    .. versionchanged:: 0.2.1
+        Accepts `key` keyword argument.
 
     .. code-block:: python
 
@@ -192,6 +194,7 @@ def clicked(*args):
 
     :param args: a series of strings representing the path to a :class:`rumps.MenuItem` in the main menu of the
                  application.
+    :param key: a string representing the key shortcut as an alternative means of clicking the menu item.
     """
     def decorator(f):
 
@@ -199,12 +202,13 @@ def clicked(*args):
             menuitem = self._menu  # self not defined yet but will be later in 'run' method
             if menuitem is None:
                 raise ValueError('no menu created')
-            try:
-                for arg in args:
+            for arg in args:
+                try:
                     menuitem = menuitem[arg]
-            except KeyError:
-                raise ValueError('no path exists in menu for {0}'.format(' -> '.join(map(repr, args))))
-            menuitem.set_callback(f)
+                except KeyError:
+                    menuitem.add(arg)
+                    menuitem = menuitem[arg]
+            menuitem.set_callback(f, options.get('key'))
 
         # delay registering the button until we have a current instance to be able to traverse the menu
         buttons = clicked.__dict__.setdefault('*buttons', [])
@@ -1030,15 +1034,26 @@ class App(object):
     # Run the application
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def run(self):
+    def run(self, **options):
         """Performs various setup tasks including creating the underlying Objective-C application, starting the timers,
         and registering callback functions for click events. Then starts the application run loop.
+
+        .. versionchanged:: 0.2.1
+            Accepts `debug` keyword argument.
+
+        :param debug: determines if application should log information useful for debugging. Same effect as calling
+                      :func:`rumps.debug_mode`.
+
         """
+        dont_change = object()
+        debug = options.get('debug', dont_change)
+        if debug is not dont_change:
+            debug_mode(debug)
+
         nsapplication = NSApplication.sharedApplication()
         nsapplication.activateIgnoringOtherApps_(True)  # NSAlerts in front
         self._nsapp = NSApp.alloc().init()
         self._nsapp._app = self.__dict__  # allow for dynamic modification based on this App instance
-        self._nsapp.initializeStatusBar()
         nsapplication.setDelegate_(self._nsapp)
         if _NOTIFICATIONS:
             NSUserNotificationCenter.defaultUserNotificationCenter().setDelegate_(self._nsapp)
@@ -1051,5 +1066,6 @@ class App(object):
             b(self)  # we waited on registering clicks so we could pass self to access _menu attribute
         del t, b
 
+        self._nsapp.initializeStatusBar()
+
         AppHelper.runEventLoop()
-        sys.exit(0)

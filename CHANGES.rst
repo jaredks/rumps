@@ -1,6 +1,17 @@
 Changes
 =======
 
+0.2.1 (2014-12-13)
+------------------
+
+- No longer have to set menu explicitly
+    + rumps will create the menu as it parses paths in ``clicked`` decorators
+- Reverted change to `timers` that produced a list of weak references rather than objects
+- New keyword arguments
+    + `key` for ``clicked``
+    + `debug` for ``App.run``
+
+
 0.2.0 (2014-08-09)
 ------------------
 
@@ -18,7 +29,7 @@ Changes
 **API changes**
 
 - Most api changes dealt with accepting ``None`` as a parameter to use or restore a default setting
-- Raise ``TypeError``s before less obvious exceptions occur in PyObjC
+- Raise ``TypeError`` before less obvious exceptions occur in PyObjC
 - alert and Window
     + No required parameters
     + Passing a string as `cancel` parameter will change the button text to that string
