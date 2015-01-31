@@ -8,7 +8,7 @@ with open('CHANGES.rst') as f:
 
 setup(
     name='rumps',
-    version='0.2.1',
+    version='0.2.1a',
     description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',
