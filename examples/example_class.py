@@ -15,7 +15,10 @@ class AwesomeStatusBarApp(rumps.App):
 
     @rumps.clicked("Say hi")
     def sayhi(self, _):
-        rumps.notification("Awesome title", "amazing subtitle", "hi!!1")
+        import os
+        path = os.path.dirname(os.path.realpath(__file__))
+        path_to_img = '%s/alert.png' % path
+        rumps.notification("Awesome title", "amazing subtitle", "hi!!1", img=path_to_img)
 
 if __name__ == "__main__":
     AwesomeStatusBarApp().run()

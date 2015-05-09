@@ -69,7 +69,7 @@ def alert(title=None, message='', ok=None, cancel=None):
     return alert.runModal()
 
 
-def notification(title, subtitle, message, data=None, sound=True):
+def notification(title, subtitle, message, data=None, sound=True,img=None):
     """Send a notification to Notification Center (Mac OS X 10.8+). If running on a version of Mac OS X that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -94,6 +94,8 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
     notification.setUserInfo_({} if data is None else data)
+    if img is not None:
+        notification.set_identityImage_(_nsimage_from_file(img))
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
