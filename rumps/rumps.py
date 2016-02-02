@@ -679,7 +679,6 @@ class Window(object):
                  secure=False):
         message = unicode(message)
         title = unicode(title)
-        print "test -----------"
 
         self._cancel = bool(cancel)
         self._icon = None
