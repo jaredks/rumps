@@ -5,7 +5,6 @@
 # Copyright: (c) 2015, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 _NOTIFICATIONS = True
 try:
     from Foundation import NSUserNotification, NSUserNotificationCenter
@@ -21,6 +20,7 @@ import os
 import weakref
 from collections import Mapping, Iterable
 from .utils import ListDict
+
 
 _TIMERS = weakref.WeakKeyDictionary()
 separator = object()
@@ -69,7 +69,7 @@ def alert(title=None, message='', ok=None, cancel=None):
     return alert.runModal()
 
 
-def notification(title, subtitle, message, data=None, sound=True):
+def notification(title, subtitle, message, data=None, sound=True, actionButton=None, otherButton=None, hasReplyButton=False):
     """Send a notification to Notification Center (Mac OS X 10.8+). If running on a version of Mac OS X that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -83,6 +83,9 @@ def notification(title, subtitle, message, data=None, sound=True):
     :param data: will be passed to the application's "notification center" (see :func:`rumps.notifications`) when this
                  notification is clicked.
     :param sound: whether the notification should make a noise when it arrives.
+    :param actionButton: title for the action button.
+    :param otherButton: title for the other button.
+    :param hasReplyButton: whether or not the notification has a reply button.
     """
     if not _NOTIFICATIONS:
         raise RuntimeError('Mac OS X 10.8+ is required to send notifications')
@@ -96,6 +99,14 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setUserInfo_({} if data is None else data)
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
+    if actionButton:
+        notification.setActionButtonTitle_(actionButton)
+        notification.set_showsButtons_(True)
+    if otherButton:
+        notification.setOtherButtonTitle_(otherButton)
+        notification.set_showsButtons_(True)
+    if hasReplyButton:
+        notification.setHasReplyButton_(True)
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
     NSUserNotificationCenter.defaultUserNotificationCenter().scheduleNotification_(notification)
 
@@ -849,6 +860,8 @@ class NSApp(NSObject):
             _log('WARNING: notification received but no function specified for answering it; use @notifications '
                  'decorator to register a function.')
         else:
+            data['activationType'] = notification.activationType()
+            data['actualDeliveryDate'] = notification.actualDeliveryDate()
             _call_as_function_or_method(notification_function, data)
 
     def initializeStatusBar(self):
