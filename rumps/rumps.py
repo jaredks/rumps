@@ -25,6 +25,14 @@ from .utils import ListDict
 _TIMERS = weakref.WeakKeyDictionary()
 separator = object()
 
+try:
+    unicode = unicode
+    bytes = str
+    basestring = basestring
+except NameError:
+    # unicode didn't exist, we are in python3
+    unicode = str
+    basestring = (str, bytes)
 
 def debug_mode(choice):
     """Enable/disable printing helpful information for debugging the program. Default is off."""
