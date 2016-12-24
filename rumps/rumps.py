@@ -6,6 +6,17 @@
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# py3 compat stub
+try:
+    import basestring
+except ImportError:
+    # Python 3
+    unicode = str
+    basestring = (str, bytes)
+else:
+    # Python 2
+    bytes = str
+
 _NOTIFICATIONS = True
 try:
     from Foundation import NSUserNotification, NSUserNotificationCenter
@@ -306,12 +317,15 @@ def _call_as_function_or_method(f, event):
         r = f(event)
         _log('given function {0} is outside an App subclass definition'.format(repr(f)))
         return r
-    except TypeError as e:  # possibly try it with self if TypeError makes sense
-        if e.message.endswith('takes exactly 2 arguments (1 given)'):
+    except TypeError as e:
+        _log('TypeError calling function {0} as unbound, retrying with "self". Error was: {1}'.format(
+            repr(f), repr(e)))
+        try:
             r = f(getattr(App, '*app_instance'), event)
             _log('given function {0} is probably inside a class (which should be an App subclass)'.format(repr(f)))
             return r
-        raise e
+        except Exception:
+            raise
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -385,7 +399,14 @@ class Menu(ListDict):
                 menu.add(iterable)
                 return
 
-            for n, ele in enumerate(iterable.iteritems() if isinstance(iterable, Mapping) else iterable):
+            local_iterable = iterable
+            if isinstance(iterable, Mapping):
+                if hasattr(iterable, 'iteritems'):
+                    local_iterable = iterable.iteritems()
+                else:
+                    local_iterable = iterable.items()
+
+            for n, ele in enumerate(local_iterable):
 
                 # for mappings we recurse but don't drop down a level in the menu
                 if not isinstance(ele, MenuItem) and isinstance(ele, Mapping):
@@ -522,7 +543,7 @@ class MenuItem(Menu):
         super(MenuItem, self).__setitem__(key, value)
 
     def __repr__(self):
-        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, repr(self.title), map(str, self),
+        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, repr(self.title), list(map(str, self)),
                                                            repr(self.callback))
 
     @property
