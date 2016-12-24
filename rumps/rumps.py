@@ -18,7 +18,9 @@ from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTe
 from PyObjCTools import AppHelper
 
 import os
+import sys
 import weakref
+
 from collections import Mapping, Iterable
 from .utils import ListDict
 
@@ -69,6 +71,59 @@ def alert(title=None, message='', ok=None, cancel=None):
     return alert.runModal()
 
 
+def _gather_info_issue_9():
+    missing_plist = False
+    missing_bundle_ident = False
+    info_plist_path = os.path.join(os.path.dirname(sys.executable), 'Info.plist')
+    try:
+        with open(info_plist_path) as f:
+            import plistlib
+            try:
+                load_plist = plistlib.load
+            except AttributeError:
+                load_plist = plistlib.readPlist
+            try:
+                load_plist(f)['CFBundleIdentifier']
+            except Exception:
+                missing_bundle_ident = True
+
+    except IOError as e:
+        import errno
+        if e.errno == errno.ENOENT:  # No such file or directory
+            missing_plist = True
+
+    info = '\n\n'
+    if missing_plist:
+        info += 'In this case there is no file at "%(info_plist_path)s"'
+        info += '\n\n'
+        confidence = 'should'
+    elif missing_bundle_ident:
+        info += 'In this case the file at "%(info_plist_path)s" does not contain a value for "CFBundleIdentifier"'
+        info += '\n\n'
+        confidence = 'should'
+    else:
+        confidence = 'may'
+    info += 'Running the following command %(confidence)s fix the issue:\n'
+    info += '/usr/libexec/PlistBuddy -c \'Add :CFBundleIdentifier string "rumps"\' %(info_plist_path)s\n'
+    return info % {'info_plist_path': info_plist_path, 'confidence': confidence}
+
+
+def _default_user_notification_center():
+    notification_center = NSUserNotificationCenter.defaultUserNotificationCenter()
+    if notification_center is None:
+        info = (
+            'Failed to setup the notification center. This issue occurs when the "Info.plist" file '
+            'cannot be found or is missing "CFBundleIdentifier".'
+        )
+        try:
+            info += _gather_info_issue_9()
+        except Exception:
+            pass
+        raise RuntimeError(info)
+    else:
+        return notification_center
+
+
 def notification(title, subtitle, message, data=None, sound=True):
     """Send a notification to Notification Center (Mac OS X 10.8+). If running on a version of Mac OS X that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
@@ -97,7 +152,8 @@ def notification(title, subtitle, message, data=None, sound=True):
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
-    NSUserNotificationCenter.defaultUserNotificationCenter().scheduleNotification_(notification)
+    notification_center = _default_user_notification_center()
+    notification_center.scheduleNotification_(notification)
 
 
 def application_support(name):
@@ -1056,7 +1112,12 @@ class App(object):
         self._nsapp._app = self.__dict__  # allow for dynamic modification based on this App instance
         nsapplication.setDelegate_(self._nsapp)
         if _NOTIFICATIONS:
-            NSUserNotificationCenter.defaultUserNotificationCenter().setDelegate_(self._nsapp)
+            try:
+                notification_center = _default_user_notification_center()
+            except RuntimeError:
+                pass
+            else:
+                notification_center.setDelegate_(self._nsapp)
 
         setattr(App, '*app_instance', self)  # class level ref to running instance (for passing self to App subclasses)
         t = b = None
