@@ -52,8 +52,8 @@ Required
 * PyObjC
 * Python 2.6+
 
-macOS 10.6 was shipped with Python 2.6 as the default version and PyObjC has been included in the default Python
-since 10.5. If you're using macOS 10.6+ and the default Python that came with it, then ``rumps`` should be
+Mac OS X 10.6 was shipped with Python 2.6 as the default version and PyObjC has been included in the default Python
+since Mac OS X 10.5. If you're using Mac OS X 10.6+ and the default Python that came with it, then ``rumps`` should be
 good to go!
 
 

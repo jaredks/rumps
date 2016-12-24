@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
+# rumps: Ridiculously Uncomplicated macOS Python Statusbar apps.
 # Copyright: (c) 2015, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -10,7 +10,7 @@
 rumps
 =====
 
-Ridiculously Uncomplicated Mac os x Python Statusbar apps.
+Ridiculously Uncomplicated macOS Python Statusbar apps.
 
 rumps exposes Objective-C classes as Python classes and functions which greatly simplifies the process of creating a
 statusbar application.

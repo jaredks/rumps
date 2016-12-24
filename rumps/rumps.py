@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# rumps: Ridiculously Uncomplicated Mac os x Python Statusbar apps.
+# rumps: Ridiculously Uncomplicated macOS Python Statusbar apps.
 # Copyright: (c) 2015, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -125,7 +125,7 @@ def _default_user_notification_center():
 
 
 def notification(title, subtitle, message, data=None, sound=True):
-    """Send a notification to Notification Center (Mac OS X 10.8+). If running on a version of Mac OS X that does not
+    """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
         "The userInfo content must be of reasonable serialized size (less than 1k) or an exception will be thrown."
@@ -140,7 +140,7 @@ def notification(title, subtitle, message, data=None, sound=True):
     :param sound: whether the notification should make a noise when it arrives.
     """
     if not _NOTIFICATIONS:
-        raise RuntimeError('Mac OS X 10.8+ is required to send notifications')
+        raise RuntimeError('OS X 10.8+ is required to send notifications')
     if data is not None and not isinstance(data, Mapping):
         raise TypeError('notification data must be a mapping')
     _require_string_or_none(title, subtitle, message)
@@ -276,8 +276,8 @@ def clicked(*args, **options):
 
 def notifications(f):
     """Decorator for registering a function to serve as a "notification center" for the application. This function will
-    receive the data associated with an incoming OS X notification sent using :func:`rumps.notification`. This occurs
-    whenever the user clicks on a notification for this application in the OS X Notification Center.
+    receive the data associated with an incoming macOS notification sent using :func:`rumps.notification`. This occurs
+    whenever the user clicks on a notification for this application in the macOS Notification Center.
 
     .. code-block:: python
 
