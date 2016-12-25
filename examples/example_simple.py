@@ -38,11 +38,11 @@ def change_statusbar_title(sender):
 
 @rumps.notifications
 def notifications(notification):  # function that reacts to incoming notification dicts
-    print notification
+    print(notification)
 
 
 def onebitcallback(sender):  # functions don't have to be decorated to serve as callbacks for buttons
-    print 4848484            # this function is specified as a callback when creating a MenuItem below
+    print(4848484)           # this function is specified as a callback when creating a MenuItem below
 
 
 if __name__ == "__main__":

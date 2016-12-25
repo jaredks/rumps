@@ -8,7 +8,7 @@ def timez():
 
 @rumps.timer(1)
 def a(sender):
-    print sender, timez()
+    print('%r %r' % (sender, timez()))
 
 
 @rumps.clicked('Change timer')
@@ -20,7 +20,7 @@ def changeit(_):
 
 @rumps.clicked('All timers')
 def activetimers(_):
-    print rumps.timers()
+    print(rumps.timers())
 
 
 @rumps.clicked('Start timer')

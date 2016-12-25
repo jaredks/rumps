@@ -18,7 +18,7 @@ def on_off_test(_):
 
 @rumps.clicked('Clean Quit')
 def clean_up_before_quit(_):
-    print 'execute clean up code'
+    print('execute clean up code')
     rumps.quit_application()
 
 

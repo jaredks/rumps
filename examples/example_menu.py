@@ -1,11 +1,15 @@
 from rumps import *
-import urllib
+
+try:
+    from urllib import urlretrieve
+except ImportError:
+    from urllib.request import urlretrieve
 
 def sayhello(sender):
-    print 'hello {}'.format(sender)
+    print('hello {}'.format(sender))
 
 def e(_):
-    print 'EEEEEEE'
+    print('EEEEEEE')
 
 def adjust_f(sender):
     if adjust_f.huh:
@@ -23,12 +27,12 @@ def adjust_f(sender):
 adjust_f.huh = True
 
 def print_f(_):
-    print f
+    print(f)
 
 f = MenuItem('F', callback=adjust_f)
 
-urllib.urlretrieve('http://upload.wikimedia.org/wikipedia/commons/thumb/c/'
-                   'c4/Kiss_Logo.svg/200px-Kiss_Logo.svg.png', 'kiss.png')
+urlretrieve('http://upload.wikimedia.org/wikipedia/commons/thumb/c/'
+            'c4/Kiss_Logo.svg/200px-Kiss_Logo.svg.png', 'kiss.png')
 app = App('lovegun', icon='kiss.png')
 app.menu = [
     MenuItem('A', callback=print_f, key='F'),
@@ -50,22 +54,22 @@ app.menu = [
 
 @clicked('update method')
 def dict_update(menu):
-    print menu
-    print menu.setdefault('boo', MenuItem('boo',
-                                          callback=lambda _: add_separator(menu)))  # lambda gets THIS menu not submenu
+    print(menu)
+    print(menu.setdefault('boo', MenuItem('boo',
+                                          callback=lambda _: add_separator(menu))))  # lambda gets THIS menu not submenu
 
 def add_separator(menu):
     menu.add(separator)
 
 @clicked('C')
 def change_main_menu(_):
-    print app.menu
-    print 'goodbye C'
+    print(app.menu)
+    print('goodbye C')
     del app.menu['C']  # DELETE SELF!!!1
 
 @clicked('stuff')
 def stuff(sender):
-    print sender
+    print(sender)
     if len(sender):
         sender.insert_after('lets', 'go?')
         sender['the'].insert_before('band', 'not')
