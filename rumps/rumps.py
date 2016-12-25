@@ -17,6 +17,7 @@ from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSear
 from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
 from PyObjCTools import AppHelper
 
+import inspect
 import os
 import sys
 import weakref
@@ -291,27 +292,18 @@ def notifications(f):
     return f
 
 
-def _call_as_function_or_method(f, event):
+def _call_as_function_or_method(func, event):
     # The idea here is that when using decorators in a class, the functions passed are not bound so we have to
     # determine later if the functions we have (those saved as callbacks) for particular events need to be passed
     # 'self'.
     #
-    # This works for an App subclass method or a standalone decorated function. Will attempt to call function with event
-    # alone then try with self and event. This might not be a great idea if the function is unbound and normally takes
-    # two arguments... but people shouldn't be decorating functions that consume more than a single parameter anyway!
-    #
-    # Decorating methods of a class subclassing something other than App should produce AttributeError eventually which
-    # is hopefully understandable.
-    try:
-        r = f(event)
-        _log('given function {0} is outside an App subclass definition'.format(repr(f)))
-        return r
-    except TypeError as e:  # possibly try it with self if TypeError makes sense
-        if e.message.endswith('takes exactly 2 arguments (1 given)'):
-            r = f(getattr(App, '*app_instance'), event)
-            _log('given function {0} is probably inside a class (which should be an App subclass)'.format(repr(f)))
-            return r
-        raise e
+    # This works for an App subclass method or a standalone decorated function. Will attempt to find function as
+    # a bound method of the App instance. If it is found, use it, otherwise simply call function.
+    app = getattr(App, '*app_instance')
+    for name, method in inspect.getmembers(app, predicate=inspect.ismethod):
+        if method.__func__ is func:
+            return method(event)
+    return func(event)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
