@@ -178,7 +178,7 @@ def quit_application(sender=None):
     nsapplication.terminate_(sender)
 
 
-def _nsimage_from_file(filename, dimensions=None):
+def _nsimage_from_file(filename, dimensions=None, template=None):
     """Take a path to an image file and return an NSImage object."""
     try:
         _log('attempting to open image at {0}'.format(filename))
@@ -197,6 +197,8 @@ def _nsimage_from_file(filename, dimensions=None):
     image = NSImage.alloc().initByReferencingFile_(filename)
     image.setScalesWhenResized_(True)
     image.setSize_((20, 20) if dimensions is None else dimensions)
+    if not template is None:
+        image.setTemplate_(template)
     return image
 
 
@@ -482,6 +484,7 @@ class MenuItem(Menu):
     :param key: the key shortcut to click this menu item. Must be a string or ``None``.
     :param icon: a path to an image. If set to ``None``, the current image (if any) is removed.
     :param dimensions: a sequence of numbers whose length is two, specifying the dimensions of the icon.
+    :param template: a boolean, specifying template mode for a given icon (proper b/w display in dark menu bar)
     """
 
     # NOTE:
@@ -498,14 +501,15 @@ class MenuItem(Menu):
             return args[0]
         return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None):
+    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None, template=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(text_type(title), None, '')
         self._menuitem.setTarget_(NSApp)
         self._menu = self._icon = None
         self.set_callback(callback, key)
-        self.set_icon(icon, dimensions)
+        self._template = template
+        self.set_icon(icon, dimensions, template)
         super(MenuItem, self).__init__()
 
     def __setitem__(self, key, value):
@@ -544,9 +548,21 @@ class MenuItem(Menu):
 
     @icon.setter
     def icon(self, icon_path):
-        self.set_icon(icon_path)
+        self.set_icon(icon_path, template=self._template)
 
-    def set_icon(self, icon_path, dimensions=None):
+    @property
+    def template(self):
+        """Template mode for an icon. If set to ``None``, the current icon (if any) is displayed as a color icon.
+        If set to ``True``, template mode is enabled and the icon will be displayed correctly in dark menu bar mode.
+        """
+        return self._template
+
+    @template.setter
+    def template(self, template_mode):
+        self._template = template_mode
+        self.set_icon(self.icon, template=template_mode)
+
+    def set_icon(self, icon_path, dimensions=None, template=None):
         """Sets the icon displayed next to the text for this menu item. If set to ``None``, the current image (if any)
         is removed. Can optionally supply `dimensions`.
 
@@ -556,8 +572,9 @@ class MenuItem(Menu):
 
         :param icon_path: a file path to an image.
         :param dimensions: a sequence of numbers whose length is two.
+        :param template: a boolean who defines the template mode for the icon.
         """
-        new_icon = _nsimage_from_file(icon_path, dimensions) if icon_path is not None else None
+        new_icon = _nsimage_from_file(icon_path, dimensions, template) if icon_path is not None else None
         self._icon = icon_path
         self._menuitem.setImage_(new_icon)
 
@@ -959,10 +976,11 @@ class App(object):
     # Serves as a setup class for NSApp since Objective-C classes shouldn't be instantiated normally.
     # This is the most user-friendly way.
 
-    def __init__(self, name, title=None, icon=None, menu=None, quit_button='Quit'):
+    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit'):
         _require_string(name)
         self._name = name
         self._icon = self._icon_nsimage = self._title = None
+        self._template = template
         self.icon = icon
         self.title = title
         self.quit_button = quit_button
@@ -1015,13 +1033,26 @@ class App(object):
 
     @icon.setter
     def icon(self, icon_path):
-        new_icon = _nsimage_from_file(icon_path) if icon_path is not None else None
+        new_icon = _nsimage_from_file(icon_path, template=self._template) if icon_path is not None else None
         self._icon = icon_path
         self._icon_nsimage = new_icon
         try:
             self._nsapp.setStatusBarIcon()
         except AttributeError:
             pass
+
+    @property
+    def template(self):
+        """Template mode for an icon. If set to ``None``, the current icon (if any) is displayed as a color icon.
+        If set to ``True``, template mode is enabled and the icon will be displayed correctly in dark menu bar mode.
+        """
+        return self._template
+
+    @template.setter
+    def template(self, template_mode):
+        self._template = template_mode
+        # resetting the icon to apply template setting
+        self.icon = self._icon
 
     @property
     def menu(self):
