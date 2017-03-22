@@ -303,7 +303,6 @@ def _call_as_function_or_method(func, event):
     # This works for an App subclass method or a standalone decorated function. Will attempt to find function as
     # a bound method of the App instance. If it is found, use it, otherwise simply call function.
     app = getattr(App, '*app_instance')
-    print(event)
     for name, method in inspect.getmembers(app, predicate=inspect.ismethod):
         if method.__func__ is func:
             return method(event)
@@ -642,18 +641,18 @@ class MenuItem(Menu):
 class SliderMenuItem(MenuItem):
 
     def __init__(self, title, value=32767, minValue=0, maxValue=65535, callback=None):
+        if isinstance(title, SliderMenuItem):  # don't initialize already existing instances
+            return
         super(SliderMenuItem, self).__init__(title)
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(minValue)
         self._slider.setMaxValue_(maxValue)
         self._slider.setValue_(value)
-        self._slider.setContinuous_('YES')
+        self._slider.setContinuous_('NO')
         self._slider.setFrameSize_(NSSize(180, 30))
         self._slider.setTarget_(NSApp)
-        # self._slider.setTarget_(self._slider)
-        NSApp._ns_to_py_and_callback[self._slider] = self, callback
-        # self._slider.setAction_('callback:' if callback is not None else None)
-        self._slider.setAction_('win:')
+        self._slider.setAction_('callback:' if callback is not None else None)
+        NSApp._ns_to_py_and_callback[self._slider] = self._slider, callback
         self._menuitem.setView_(self._slider)
 
     def __repr__(self):
@@ -978,15 +977,7 @@ class NSApp(NSObject):
             self.nsstatusitem.setTitle_(self._app['_name'])
 
     @classmethod
-    def win_(cls, sender):
-        print(sender.value())
-
-    @classmethod
     def callback_(cls, sender):
-        # print(sender)
-        # print("hey")
-        # print(cls._ns_to_py_and_callback)
-        # print(cls._ns_to_py_and_callback[sender])
         self, callback = cls._ns_to_py_and_callback[sender]
         _log(self)
         return _call_as_function_or_method(callback, self)
