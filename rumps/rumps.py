@@ -13,8 +13,8 @@ except ImportError:
     _NOTIFICATIONS = False
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
-                        NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
+                        NSMakeRect, NSLog, NSObject, NSSize)
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage, NSSlider
 from PyObjCTools import AppHelper
 
 import inspect
@@ -636,6 +636,26 @@ class MenuItem(Menu):
 
         """
         return self._menuitem.keyEquivalent()
+
+
+class SliderMenuItem(MenuItem):
+    def __init__(self, title, value=50, minValue=0, maxValue=100, callback=None):
+        print(callback)
+
+        super(SliderMenuItem, self).__init__(title)
+        self._slider = NSSlider.alloc().init()
+        self._slider.setValue_(value)
+        self._slider.setMinValue_(minValue)
+        self._slider.setMaxValue_(maxValue)
+        self._slider.setFrameSize_(NSSize(160, 16))
+        self._slider.setTarget_(NSApp)
+        NSApp._ns_to_py_and_callback[self._slider] = self, callback
+        self._slider.setAction_('callback:' if callback is not None else None)
+        self._menuitem.setView_(self._slider)
+
+    def __repr__(self):
+        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, map(str, self),
+                                                           repr(self.callback))
 
 
 class SeparatorMenuItem(object):
