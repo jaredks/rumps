@@ -654,14 +654,14 @@ class SliderMenuItem(MenuItem):
             return args[0]
         return super(SliderMenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, value=50, minValue=0, maxValue=100, callback=None, name=None):
+    def __init__(self, title, value=50, minValue=0, maxValue=100, callback=None, name=None, dimensions=(180, 15)):
         if isinstance(title, SliderMenuItem):  # don't initialize already existing instances
             return
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(minValue)
         self._slider.setMaxValue_(maxValue)
         self._slider.setValue_(value)
-        self._slider.setFrameSize_(NSSize(180, 15))
+        self._slider.setFrameSize_(NSSize(*dimensions))
         self._slider.setTarget_(NSApp)
         self.set_slider_callback(callback)
         super(SliderMenuItem, self).__init__(title, name=name)
