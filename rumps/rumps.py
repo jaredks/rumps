@@ -501,7 +501,7 @@ class MenuItem(Menu):
             return args[0]
         return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None, template=None):
+    def __init__(self, title, name=None, callback=None, key=None, icon=None, dimensions=None, template=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(text_type(title), None, '')
@@ -510,6 +510,7 @@ class MenuItem(Menu):
         self.set_callback(callback, key)
         self._template = template
         self.set_icon(icon, dimensions, template)
+        self._name = name
         super(MenuItem, self).__init__()
 
     def __setitem__(self, key, value):
@@ -533,6 +534,14 @@ class MenuItem(Menu):
     def title(self, new_title):
         new_title = text_type(new_title)
         self._menuitem.setTitle_(new_title)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, new_name):
+        self._name = text_type(new_name)
 
     @property
     def icon(self):
@@ -640,24 +649,35 @@ class MenuItem(Menu):
 
 class SliderMenuItem(MenuItem):
 
-    def __init__(self, title, value=32767, minValue=0, maxValue=65535, callback=None):
+    def __new__(cls, *args, **kwargs):
+        if args and isinstance(args[0], SliderMenuItem):  # can safely wrap SliderMenuItem instances
+            return args[0]
+        return super(SliderMenuItem, cls).__new__(cls, *args, **kwargs)
+
+    def __init__(self, title, value=50, minValue=0, maxValue=100, callback=None, name=None):
         if isinstance(title, SliderMenuItem):  # don't initialize already existing instances
             return
-        super(SliderMenuItem, self).__init__(title)
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(minValue)
         self._slider.setMaxValue_(maxValue)
         self._slider.setValue_(value)
-        self._slider.setContinuous_('NO')
-        self._slider.setFrameSize_(NSSize(180, 30))
+        self._slider.setFrameSize_(NSSize(180, 15))
         self._slider.setTarget_(NSApp)
-        self._slider.setAction_('callback:' if callback is not None else None)
-        NSApp._ns_to_py_and_callback[self._slider] = self._slider, callback
+        self.set_slider_callback(callback)
+        super(SliderMenuItem, self).__init__(title, name=name)
         self._menuitem.setView_(self._slider)
 
     def __repr__(self):
-        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, map(str, self),
-                                                           repr(self.callback))
+        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, repr(self._menuitem.title),
+                                                           list(map(str, self)), repr(self.sliderCallback))
+
+    def set_slider_callback(self, callback):
+        NSApp._ns_to_py_and_callback[self._slider] = self, callback
+        self._slider.setAction_('callback:' if callback is not None else None)
+
+    @property
+    def sliderCallback(self):
+        return NSApp._ns_to_py_and_callback[self._slider][1]
 
     @property
     def value(self):
@@ -979,7 +999,6 @@ class NSApp(NSObject):
     @classmethod
     def callback_(cls, sender):
         self, callback = cls._ns_to_py_and_callback[sender]
-        _log(self)
         return _call_as_function_or_method(callback, self)
 
 
