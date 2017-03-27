@@ -999,6 +999,7 @@ class NSApp(NSObject):
     @classmethod
     def callback_(cls, sender):
         self, callback = cls._ns_to_py_and_callback[sender]
+        _log(self)
         return _call_as_function_or_method(callback, self)
 
 
