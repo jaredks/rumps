@@ -42,10 +42,10 @@ def debug_mode(choice):
 debug_mode(False)
 
 
-def alert(title=None, message='', ok=None, cancel=None):
+def alert(title=None, message='', ok=None, cancel=None, other=None):
     """Generate a simple alert window.
 
-    .. versionchanged:: 0.2.0
+    .. versionchanged:: 0.2.3
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `title` is no longer
         a required parameter.
 
@@ -58,6 +58,8 @@ def alert(title=None, message='', ok=None, cancel=None):
     :param cancel: the text for the "cancel" button. If a string, the button will have that text. If `cancel`
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
+    :param other: the text for the "other" button. If a string, the button will have that text. Otherwise, this button will not be
+                   created.
     :return: a number representing the button pressed. The "ok" button is ``1`` and "cancel" is ``0``.
     """
     message = text_type(message)
@@ -67,7 +69,7 @@ def alert(title=None, message='', ok=None, cancel=None):
     if not isinstance(cancel, string_types):
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
-        title, ok, cancel, None, message)
+        title, ok, cancel, other, message)
     alert.setAlertStyle_(0)  # informational style
     _log('alert opened with message: {0}, title: {1}'.format(repr(message), repr(title)))
     return alert.runModal()
