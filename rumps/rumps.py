@@ -13,7 +13,7 @@ except ImportError:
     _NOTIFICATIONS = False
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
-                        NSMakeRect, NSLog, NSObject)
+                        NSMakeRect, NSLog, NSObject, NSBundle)
 from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
 from PyObjCTools import AppHelper
 
@@ -988,6 +988,9 @@ class App(object):
         if menu is not None:
             self.menu = menu
         self._application_support = application_support(self._name)
+
+        if not 'CFBundleIdentifier' in NSBundle.mainBundle().infoDictionary():
+           NSBundle.mainBundle().infoDictionary()['CFBundleIdentifier'] = name
 
     # Properties
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
