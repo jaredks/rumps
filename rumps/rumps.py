@@ -42,7 +42,7 @@ def debug_mode(choice):
 debug_mode(False)
 
 
-def alert(title=None, message='', ok=None, cancel=None, other=None):
+def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
     """Generate a simple alert window.
 
     .. versionchanged:: 0.2.3
@@ -60,6 +60,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None):
                    created.
     :param other: the text for the "other" button. If a string, the button will have that text. Otherwise, this button will not be
                    created.
+    :param icon_path: a path to an image. If ``None``, the applications icon is used.
     :return: a number representing the button pressed. The "ok" button is ``1`` and "cancel" is ``0``.
     """
     message = text_type(message)
@@ -71,6 +72,9 @@ def alert(title=None, message='', ok=None, cancel=None, other=None):
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
         title, ok, cancel, other, message)
     alert.setAlertStyle_(0)  # informational style
+    if icon_path is not None:
+        icon = _nsimage_from_file(icon_path)
+        alert.setIcon_(icon)
     _log('alert opened with message: {0}, title: {1}'.format(repr(message), repr(title)))
     return alert.runModal()
 
