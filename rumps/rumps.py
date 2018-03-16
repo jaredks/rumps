@@ -8,7 +8,7 @@
 
 _NOTIFICATIONS = True
 try:
-    from Foundation import NSUserNotification, NSUserNotificationCenter
+    from Foundation import NSUserNotification, NSUserNotificationCenter, NSMutableDictionary
 except ImportError:
     _NOTIFICATIONS = False
 
@@ -150,7 +150,9 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setTitle_(title)
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
-    notification.setUserInfo_({} if data is None else data)
+    infoDict = NSMutableDictionary.alloc().init()
+    infoDict.setDictionary_({} if data is None else data)
+    notification.setUserInfo_(infoDict)
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
