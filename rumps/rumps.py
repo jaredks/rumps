@@ -8,13 +8,13 @@
 
 _NOTIFICATIONS = True
 try:
-    from Foundation import NSUserNotification, NSUserNotificationCenter
+    from Foundation import NSUserNotification, NSUserNotificationCenter, NSMutableDictionary
 except ImportError:
     _NOTIFICATIONS = False
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage
 from PyObjCTools import AppHelper
 
 import inspect
@@ -42,7 +42,7 @@ def debug_mode(choice):
 debug_mode(False)
 
 
-def alert(title=None, message='', ok=None, cancel=None):
+def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
     """Generate a simple alert window.
 
     .. versionchanged:: 0.2.0
@@ -58,17 +58,24 @@ def alert(title=None, message='', ok=None, cancel=None):
     :param cancel: the text for the "cancel" button. If a string, the button will have that text. If `cancel`
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
+    :param other: the text for the "other" button. If a string, the button will have that text. Otherwise, this button
+                  will not be created.
+    :param icon_path: a path to an image. If ``None``, the applications icon is used.
     :return: a number representing the button pressed. The "ok" button is ``1`` and "cancel" is ``0``.
     """
     message = text_type(message)
+    message = message.replace('%', '%%')
     if title is not None:
         title = text_type(title)
     _require_string_or_none(ok)
     if not isinstance(cancel, string_types):
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
-        title, ok, cancel, None, message)
+        title, ok, cancel, other, message)
     alert.setAlertStyle_(0)  # informational style
+    if icon_path is not None:
+        icon = _nsimage_from_file(icon_path)
+        alert.setIcon_(icon)
     _log('alert opened with message: {0}, title: {1}'.format(repr(message), repr(title)))
     return alert.runModal()
 
@@ -126,7 +133,8 @@ def _default_user_notification_center():
         return notification_center
 
 
-def notification(title, subtitle, message, data=None, sound=True):
+def notification(title, subtitle, message, data=None, sound=True, action_button=None, other_button=None,
+                 reply_button=None, icon=None):
     """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -140,6 +148,9 @@ def notification(title, subtitle, message, data=None, sound=True):
     :param data: will be passed to the application's "notification center" (see :func:`rumps.notifications`) when this
                  notification is clicked.
     :param sound: whether the notification should make a noise when it arrives.
+    :param action_button: title for the action button.
+    :param other_button: title for the other button.
+    :param reply_button: A boolean representing whether or not the notification has a reply button.
     """
     if not _NOTIFICATIONS:
         raise RuntimeError('OS X 10.8+ is required to send notifications')
@@ -150,9 +161,21 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setTitle_(title)
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
-    notification.setUserInfo_({} if data is None else data)
+    info_dict = NSMutableDictionary.alloc().init()
+    info_dict.setDictionary_({} if data is None else data)
+    notification.setUserInfo_(info_dict)
+    if icon:
+        notification.set_identityImage_(_nsimage_from_file(icon))
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
+    if action_button:
+        notification.setActionButtonTitle_(action_button)
+        notification.set_showsButtons_(True)
+    if other_button:
+        notification.setOtherButtonTitle_(other_button)
+        notification.set_showsButtons_(True)
+    if reply_button:
+        notification.setHasReplyButton_(True)
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
     notification_center = _default_user_notification_center()
     notification_center.scheduleNotification_(notification)
@@ -738,10 +761,12 @@ class Window(object):
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
     :param dimensions: the size of the editable textbox. Must be sequence with a length of 2.
+    :param secure: should the text field be secured or not. With True the window can be used for passwords.
     """
 
-    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160)):
+    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160), secure=None):
         message = text_type(message)
+        message = message.replace('%', '%%')
         title = text_type(title)
 
         self._cancel = bool(cancel)
@@ -755,7 +780,8 @@ class Window(object):
             title, ok, cancel, None, message)
         self._alert.setAlertStyle_(0)  # informational style
 
-        self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+        text_field_type = NSSecureTextField if secure else NSTextField
+        self._textfield = text_field_type.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
         self._textfield.setSelectable_(True)
         self._alert.setAccessoryView_(self._textfield)
 
@@ -915,6 +941,8 @@ class NSApp(NSObject):
             _log('WARNING: notification received but no function specified for answering it; use @notifications '
                  'decorator to register a function.')
         else:
+            data['activationType'] = notification.activationType()
+            data['actualDeliveryDate'] = notification.actualDeliveryDate()
             _call_as_function_or_method(notification_function, data)
 
     def initializeStatusBar(self):
@@ -1131,7 +1159,7 @@ class App(object):
             debug_mode(debug)
 
         nsapplication = NSApplication.sharedApplication()
-        nsapplication.activateIgnoringOtherApps_(True)  # NSAlerts in front
+        nsapplication.activateIgnoringOtherApps_(False)  # NSAlerts in front
         self._nsapp = NSApp.alloc().init()
         self._nsapp._app = self.__dict__  # allow for dynamic modification based on this App instance
         nsapplication.setDelegate_(self._nsapp)
