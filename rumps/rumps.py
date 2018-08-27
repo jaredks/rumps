@@ -14,7 +14,8 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage
+from AppKit import (NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage,
+                    NSBeep, NSSpeechSynthesizer)
 from PyObjCTools import AppHelper
 
 import inspect
@@ -39,7 +40,29 @@ def debug_mode(choice):
     else:
         def _log(*_):
             pass
+
+
 debug_mode(False)
+
+
+def error():
+    """Generate a simple system beep."""
+    NSBeep()
+
+
+class SpeechSynthesizer:
+
+    def __init__(self, message):
+        self.synth = NSSpeechSynthesizer.alloc().initWithVoice_(None)
+        self.synth.startSpeakingString_(message)
+
+    def stop(self):
+        if self.synth.speaking:
+            self.synth.stopSpeaking()
+
+
+def speak(message):
+    return SpeechSynthesizer(message)
 
 
 def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
