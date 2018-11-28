@@ -15,7 +15,7 @@ except ImportError:
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject)
 from AppKit import (NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage,
-                    NSBeep, NSSpeechSynthesizer)
+                    NSBeep, NSSpeechSynthesizer, NSImageView)
 from PyObjCTools import AppHelper
 
 import inspect
@@ -208,6 +208,10 @@ def notification(title, subtitle, message, data=None, sound=True, action_button=
     notification_center.scheduleNotification_(notification)
 
 
+def show_image(image):
+    return _nsimage_window_from_file(image)
+
+
 def application_support(name):
     """Return the application support folder path for the given `name`, creating it if it doesn't exist."""
     app_support_path = os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, 1).objectAtIndex_(0), name)
@@ -250,6 +254,28 @@ def _nsimage_from_file(filename, dimensions=None, template=None):
     if not template is None:
         image.setTemplate_(template)
     return image
+
+def _nsimage_window_from_file(filename, dimensions=None, template=None):
+    """Take a path to an image file and return an NSImage object."""
+    try:
+        _log('attempting to open image at {0}'.format(filename))
+        with open(filename):
+            pass
+    except IOError:  # literal file path didn't work -- try to locate image based on main script path
+        try:
+            from __main__ import __file__ as main_script_path
+            main_script_path = os.path.dirname(main_script_path)
+            filename = os.path.join(main_script_path, filename)
+        except ImportError:
+            pass
+        _log('attempting (again) to open image at {0}'.format(filename))
+        with open(filename):  # file doesn't exist
+            pass              # otherwise silently errors in NSImage which isn't helpful for debugging
+
+    image = _nsimage_from_file(filename, dimensions, template)
+    if image:
+        window = NSImageView.alloc().init(image)
+        return window
 
 
 def _require_string(*objs):
