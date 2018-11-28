@@ -1208,3 +1208,8 @@ class App(object):
         self._nsapp.initializeStatusBar()
 
         AppHelper.runEventLoop()
+
+    def quit(self, sender=None):
+        """Save settings before quitting application. Can be overridden, but should call super if it is."""
+        self.settings = self.settings
+        quit_application(sender)
