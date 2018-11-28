@@ -45,9 +45,12 @@ debug_mode(False)
 def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
     """Generate a simple alert window.
 
-    .. versionchanged:: 0.2.3
+    .. versionchanged:: 0.2.0
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `title` is no longer
         a required parameter.
+
+    .. versionchanged:: 0.2.3
+        Add `other` button functionality as well as `icon_path` to change the alert icon.
 
     :param title: the text positioned at the top of the window in larger font. If ``None``, a default localized title
                   is used. If not ``None`` or a string, will use the string representation of the object.
