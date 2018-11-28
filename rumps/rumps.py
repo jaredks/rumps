@@ -999,9 +999,6 @@ class App(object):
                  default_persistent_settings=default_persistent_settings, settings_filename='persistent_settings.json'):
         _require_string(name)
         self._name = name
-        self._settings_filename = settings_filename
-        loaded_settings = self.open_json(self._settings_filename, 'r')
-        self._persistent_settings = loaded_settings if loaded_settings else default_persistent_settings
         self._icon = self._icon_nsimage = self._title = None
         self._template = template
         self.icon = icon
@@ -1011,6 +1008,14 @@ class App(object):
         if menu is not None:
             self.menu = menu
         self._application_support = application_support(self._name)
+
+        # Must be set after application support folder
+        self._settings_filename = settings_filename
+        try:
+            self._persistent_settings = self.open_json(self._settings_filename, 'r')
+        except FileNotFoundError:
+            self.save_json(default_persistent_settings, self._settings_filename, 'w+')
+            self._persistent_settings = default_persistent_settings
 
     # Properties
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1148,7 +1153,8 @@ class App(object):
 
     def open_json(self, *args):
         """Open a file ending in `.json`"""
-        return json.loads(self.open(*args))
+        with self.open(*args) as path:
+            return json.loads(path.read())
 
     def save_json(self, data, *args, pretty=True):
         """Write to a file ending in `.json`"""
