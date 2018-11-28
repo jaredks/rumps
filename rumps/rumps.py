@@ -68,6 +68,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
     :return: a number representing the button pressed. The "ok" button is ``1`` and "cancel" is ``0``.
     """
     message = text_type(message)
+    message = message.replace('%', '%%')
     if title is not None:
         title = text_type(title)
     _require_string_or_none(ok)
@@ -754,6 +755,7 @@ class Window(object):
 
     def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160)):
         message = text_type(message)
+        message = message.replace('%', '%%')
         title = text_type(title)
 
         self._cancel = bool(cancel)
