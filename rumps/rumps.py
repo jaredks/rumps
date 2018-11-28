@@ -20,6 +20,7 @@ from PyObjCTools import AppHelper
 import inspect
 import os
 import sys
+import traceback
 import weakref
 
 from collections import Mapping, Iterable
@@ -961,7 +962,10 @@ class NSApp(NSObject):
     def callback_(cls, nsmenuitem):
         self, callback = cls._ns_to_py_and_callback[nsmenuitem]
         _log(self)
-        return _call_as_function_or_method(callback, self)
+        try:
+            return _call_as_function_or_method(callback, self)
+        except Exception:
+            _log(traceback.format_exc())
 
 
 class App(object):
