@@ -18,6 +18,7 @@ from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTe
 from PyObjCTools import AppHelper
 
 import inspect
+import json
 import os
 import sys
 import traceback
@@ -992,10 +993,15 @@ class App(object):
     # NOTE:
     # Serves as a setup class for NSApp since Objective-C classes shouldn't be instantiated normally.
     # This is the most user-friendly way.
+    default_persistent_settings = {}
 
-    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit'):
+    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit',
+                 default_persistent_settings=default_persistent_settings, settings_filename='persistent_settings.json'):
         _require_string(name)
         self._name = name
+        self._settings_filename = settings_filename
+        loaded_settings = self.open_json(self._settings_filename, 'r')
+        self._persistent_settings = loaded_settings if loaded_settings else default_persistent_settings
         self._icon = self._icon_nsimage = self._title = None
         self._template = template
         self.icon = icon
@@ -1015,6 +1021,18 @@ class App(object):
         text of the application if :attr:`title` is not set.
         """
         return self._name
+
+    @property
+    def settings(self):
+        """A JSON Object of settings for the application. Uses 'persistent_settings.json' if :attr:`filename` is not
+        set.
+        """
+        return self._persistent_settings
+
+    @settings.setter
+    def settings(self, settings):
+        self._persistent_settings.update(settings)
+        self.save_json(self._persistent_settings, self._settings_filename, 'w+')
 
     @property
     def title(self):
@@ -1127,6 +1145,19 @@ class App(object):
 
         """
         return open(os.path.join(self._application_support, args[0]), *args[1:])
+
+    def open_json(self, *args):
+        """Open a file ending in `.json`"""
+        return json.loads(self.open(*args))
+
+    def save_json(self, data, *args, pretty=True):
+        """Write to a file ending in `.json`"""
+        with self.open(*args) as json_file:
+            if pretty:
+                json_file.write(json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True))
+            else:
+                json_file.write(json.dumps(data))
+            return True
 
     # Run the application
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
