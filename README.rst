@@ -198,8 +198,5 @@ Works Made With rumps
 `WordTime
 <https://github.com/Demonstrandum/WordTime/>`_
 
-`Zero
-<https://github.com/sogseal/Zero/>`_
-
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
