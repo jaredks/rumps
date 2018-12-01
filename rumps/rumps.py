@@ -729,7 +729,10 @@ class Timer(object):
 
     def callback_(self, _):
         _log(self)
-        return _call_as_function_or_method(getattr(self, '*callback'), self)
+        try:
+            return _call_as_function_or_method(getattr(self, '*callback'), self)
+        except Exception:
+            _log(traceback.format_exc())
 
 
 class Window(object):
@@ -929,7 +932,10 @@ class NSApp(NSObject):
             _log('WARNING: notification received but no function specified for answering it; use @notifications '
                  'decorator to register a function.')
         else:
-            _call_as_function_or_method(notification_function, data)
+            try:
+                _call_as_function_or_method(notification_function, data)
+            except Exception:
+                _log(traceback.format_exc())
 
     def initializeStatusBar(self):
         self.nsstatusitem = NSStatusBar.systemStatusBar().statusItemWithLength_(-1)  # variable dimensions
