@@ -159,6 +159,9 @@ Works Made With rumps
 `idiot
 <https://github.com/snare/idiot/>`_
 
+`LifxController
+<https://github.com/mitchmcdee/LifxController/>`_
+
 `mac-shrew
 <https://github.com/mejmo/mac-shrew/>`_
 
