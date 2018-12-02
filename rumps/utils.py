@@ -6,9 +6,7 @@
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 try:  # Python 2.7+
-    from test.support import import_fresh_module
-    pyCollections = import_fresh_module('collections', blocked=['_collections'])
-    _OrderedDict, _Link = pyCollections.OrderedDict, pyCollections._Link
+    from collections import OrderedDict as _OrderedDict
 except ImportError:
     from .packages.ordereddict import OrderedDict as _OrderedDict
 
@@ -18,17 +16,15 @@ except ImportError:
 class ListDict(_OrderedDict):
     def __insertion(self, link_prev, key_value):
         key, value = key_value
-        if link_prev.key != key:
+        if link_prev[2] != key:
             if key in self:
                 del self[key]
-            link_next = link_prev.next
-            new_link = _Link()
-            new_link.prev, new_link.next, new_link.key = link_prev, link_next, key
-            self._OrderedDict__map[key] = link_prev.next = link_next.prev = new_link
+            link_next = link_prev[1]
+            self._OrderedDict__map[key] = link_prev[1] = link_next[0] = [link_prev, link_next, key]
         dict.__setitem__(self, key, value)
 
     def insert_after(self, existing_key, key_value):
         self.__insertion(self._OrderedDict__map[existing_key], key_value)
 
     def insert_before(self, existing_key, key_value):
-        self.__insertion(self._OrderedDict__map[existing_key].prev, key_value)
+        self.__insertion(self._OrderedDict__map[existing_key][0], key_value)
