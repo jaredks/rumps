@@ -5,10 +5,7 @@
 # Copyright: (c) 2017, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-try:  # Python 2.7+
-    from collections import OrderedDict as _OrderedDict
-except ImportError:
-    from .packages.ordereddict import OrderedDict as _OrderedDict
+from .packages.ordereddict import OrderedDict as _OrderedDict
 
 
 # ListDict: OrderedDict subclass with insertion methods for modifying the order of the linked list in O(1) time
