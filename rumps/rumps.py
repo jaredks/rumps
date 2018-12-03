@@ -14,7 +14,7 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage
 from PyObjCTools import AppHelper
 
 import inspect
@@ -742,6 +742,9 @@ class Window(object):
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `message` is no
         longer a required parameter.
 
+    .. versionchanged:: 0.2.3
+        Add `secure` text input field functionality.
+
     :param message: the text positioned below the `title` in smaller font. If not a string, will use the string
                     representation of the object.
     :param title: the text positioned at the top of the window in larger font. If not a string, will use the string
@@ -754,9 +757,11 @@ class Window(object):
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
     :param dimensions: the size of the editable textbox. Must be sequence with a length of 2.
+    :param secure: should the text field be secured or not. With ``True`` the window can be used for passwords.
     """
 
-    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160)):
+    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160),
+                 secure=False):
         message = text_type(message)
         message = message.replace('%', '%%')
         title = text_type(title)
@@ -772,7 +777,10 @@ class Window(object):
             title, ok, cancel, None, message)
         self._alert.setAlertStyle_(0)  # informational style
 
-        self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+        if secure:
+            self._textfield = NSSecureTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+        else:
+            self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
         self._textfield.setSelectable_(True)
         self._alert.setAccessoryView_(self._textfield)
 
