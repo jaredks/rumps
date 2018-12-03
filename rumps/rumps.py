@@ -520,7 +520,7 @@ class MenuItem(Menu):
             return args[0]
         return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, name=None, callback=None, key=None, icon=None, dimensions=None, template=None):
+    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None, template=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(text_type(title), None, '')
@@ -529,7 +529,6 @@ class MenuItem(Menu):
         self.set_callback(callback, key)
         self._template = template
         self.set_icon(icon, dimensions, template)
-        self._name = name
         super(MenuItem, self).__init__()
 
     def __setitem__(self, key, value):
@@ -553,14 +552,6 @@ class MenuItem(Menu):
     def title(self, new_title):
         new_title = text_type(new_title)
         self._menuitem.setTitle_(new_title)
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, new_name):
-        self._name = text_type(new_name)
 
     @property
     def icon(self):
@@ -673,17 +664,17 @@ class SliderMenuItem(MenuItem):
             return args[0]
         return super(SliderMenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, value=50, minValue=0, maxValue=100, callback=None, name=None, dimensions=(180, 15)):
+    def __init__(self, title, value=50, min_value=0, max_value=100, callback=None, dimensions=(180, 15)):
         if isinstance(title, SliderMenuItem):  # don't initialize already existing instances
             return
         self._slider = NSSlider.alloc().init()
-        self._slider.setMinValue_(minValue)
-        self._slider.setMaxValue_(maxValue)
+        self._slider.setMinValue_(min_value)
+        self._slider.setMaxValue_(max_value)
         self._slider.setValue_(value)
         self._slider.setFrameSize_(NSSize(*dimensions))
         self._slider.setTarget_(NSApp)
         self.set_slider_callback(callback)
-        super(SliderMenuItem, self).__init__(title, name=name)
+        super(SliderMenuItem, self).__init__(title)
         self._menuitem.setView_(self._slider)
 
     def __repr__(self):
@@ -1031,8 +1022,8 @@ class NSApp(NSObject):
             self.nsstatusitem.setTitle_(self._app['_name'])
 
     @classmethod
-    def callback_(cls, sender):
-        self, callback = cls._ns_to_py_and_callback[sender]
+    def callback_(cls, nsmenuitem):
+        self, callback = cls._ns_to_py_and_callback[nsmenuitem]
         _log(self)
         try:
             return _call_as_function_or_method(callback, self)
