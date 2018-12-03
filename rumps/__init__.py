@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # rumps: Ridiculously Uncomplicated macOS Python Statusbar apps.
-# Copyright: (c) 2015, Jared Suttles. All rights reserved.
+# Copyright: (c) 2017, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -17,10 +17,10 @@ statusbar application.
 """
 
 __title__ = 'rumps'
-__version__ = '0.2.1a'
+__version__ = '0.2.2.dev'
 __author__ = 'Jared Suttles'
 __license__ = 'Modified BSD'
-__copyright__ = 'Copyright 2015 Jared Suttles'
+__copyright__ = 'Copyright 2017 Jared Suttles'
 
 from .rumps import (separator, debug_mode, alert, notification, application_support, timers, quit_application, timer,
                     clicked, notifications, MenuItem, SliderMenuItem, Timer, Window, App)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
+import re
 import sys
+
 from setuptools import setup
 
 INFO_PLIST_TEMPLATE = '''\
@@ -23,10 +25,12 @@ with open('README.rst') as f:
     readme = f.read()
 with open('CHANGES.rst') as f:
     changes = f.read()
+with open('rumps/__init__.py') as f:
+    version = re.search(r'__version__ = \'(.*?)\'', f.read()).group(1)
 
 setup(
     name='rumps',
-    version='0.2.1a',
+    version=version,
     description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',
@@ -34,7 +38,7 @@ setup(
     package_data={'': ['LICENSE']},
     long_description=readme + '\n\n' + changes,
     license='BSD License',
-    install_requires=['pyobjc'],
+    install_requires=['pyobjc-framework-Cocoa'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: MacOS X',

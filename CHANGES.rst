@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.2.2 (2017-04-26)
+------------------
+
+- Add template icon support for dark menubar theme.
+- Fix inability to create notification center by creating ``Info.plist`` file at executable directory with `CFBundleIdentifier` on installation. If that failed, provide more information at runtime in the exception about how to fix the problem.
+- Add Python 3 support
+
+
 0.2.1 (2014-12-13)
 ------------------
 

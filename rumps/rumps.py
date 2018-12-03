@@ -2,24 +2,31 @@
 # -*- coding: utf-8 -*-
 #
 # rumps: Ridiculously Uncomplicated macOS Python Statusbar apps.
-# Copyright: (c) 2015, Jared Suttles. All rights reserved.
+# Copyright: (c) 2017, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 _NOTIFICATIONS = True
+
+# For compatibility with pyinstaller
+# See: http://stackoverflow.com/questions/21058889/pyinstaller-not-finding-pyobjc-library-macos-python
+import Foundation
+import AppKit
+
 try:
-    from Foundation import NSUserNotification, NSUserNotificationCenter
+    from Foundation import NSUserNotification, NSUserNotificationCenter, NSMutableDictionary
 except ImportError:
     _NOTIFICATIONS = False
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSSize)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSImage, NSSlider
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider
 from PyObjCTools import AppHelper
 
 import inspect
 import os
 import sys
+import traceback
 import weakref
 
 from collections import Mapping, Iterable
@@ -42,12 +49,15 @@ def debug_mode(choice):
 debug_mode(False)
 
 
-def alert(title=None, message='', ok=None, cancel=None):
+def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
     """Generate a simple alert window.
 
     .. versionchanged:: 0.2.0
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `title` is no longer
         a required parameter.
+
+    .. versionchanged:: 0.2.3
+        Add `other` button functionality as well as `icon_path` to change the alert icon.
 
     :param title: the text positioned at the top of the window in larger font. If ``None``, a default localized title
                   is used. If not ``None`` or a string, will use the string representation of the object.
@@ -58,17 +68,24 @@ def alert(title=None, message='', ok=None, cancel=None):
     :param cancel: the text for the "cancel" button. If a string, the button will have that text. If `cancel`
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
+    :param other: the text for the "other" button. If a string, the button will have that text. Otherwise, this button will not be
+                   created.
+    :param icon_path: a path to an image. If ``None``, the applications icon is used.
     :return: a number representing the button pressed. The "ok" button is ``1`` and "cancel" is ``0``.
     """
     message = text_type(message)
+    message = message.replace('%', '%%')
     if title is not None:
         title = text_type(title)
     _require_string_or_none(ok)
     if not isinstance(cancel, string_types):
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
-        title, ok, cancel, None, message)
+        title, ok, cancel, other, message)
     alert.setAlertStyle_(0)  # informational style
+    if icon_path is not None:
+        icon = _nsimage_from_file(icon_path)
+        alert.setIcon_(icon)
     _log('alert opened with message: {0}, title: {1}'.format(repr(message), repr(title)))
     return alert.runModal()
 
@@ -150,7 +167,9 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setTitle_(title)
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
-    notification.setUserInfo_({} if data is None else data)
+    infoDict = NSMutableDictionary.alloc().init()
+    infoDict.setDictionary_({} if data is None else data)
+    notification.setUserInfo_(infoDict)
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
@@ -766,7 +785,10 @@ class Timer(object):
 
     def callback_(self, _):
         _log(self)
-        return _call_as_function_or_method(getattr(self, '*callback'), self)
+        try:
+            return _call_as_function_or_method(getattr(self, '*callback'), self)
+        except Exception:
+            _log(traceback.format_exc())
 
 
 class Window(object):
@@ -775,6 +797,9 @@ class Window(object):
     .. versionchanged:: 0.2.0
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `message` is no
         longer a required parameter.
+
+    .. versionchanged:: 0.2.3
+        Add `secure` text input field functionality.
 
     :param message: the text positioned below the `title` in smaller font. If not a string, will use the string
                     representation of the object.
@@ -788,10 +813,13 @@ class Window(object):
                    evaluates to ``True``, will create a button with text "Cancel". Otherwise, this button will not be
                    created.
     :param dimensions: the size of the editable textbox. Must be sequence with a length of 2.
+    :param secure: should the text field be secured or not. With ``True`` the window can be used for passwords.
     """
 
-    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160)):
+    def __init__(self, message='', title='', default_text='', ok=None, cancel=None, dimensions=(320, 160),
+                 secure=False):
         message = text_type(message)
+        message = message.replace('%', '%%')
         title = text_type(title)
 
         self._cancel = bool(cancel)
@@ -805,7 +833,10 @@ class Window(object):
             title, ok, cancel, None, message)
         self._alert.setAlertStyle_(0)  # informational style
 
-        self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+        if secure:
+            self._textfield = NSSecureTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+        else:
+            self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
         self._textfield.setSelectable_(True)
         self._alert.setAccessoryView_(self._textfield)
 
@@ -965,7 +996,10 @@ class NSApp(NSObject):
             _log('WARNING: notification received but no function specified for answering it; use @notifications '
                  'decorator to register a function.')
         else:
-            _call_as_function_or_method(notification_function, data)
+            try:
+                _call_as_function_or_method(notification_function, data)
+            except Exception:
+                _log(traceback.format_exc())
 
     def initializeStatusBar(self):
         self.nsstatusitem = NSStatusBar.systemStatusBar().statusItemWithLength_(-1)  # variable dimensions
@@ -1000,7 +1034,10 @@ class NSApp(NSObject):
     def callback_(cls, sender):
         self, callback = cls._ns_to_py_and_callback[sender]
         _log(self)
-        return _call_as_function_or_method(callback, self)
+        try:
+            return _call_as_function_or_method(callback, self)
+        except Exception:
+            _log(traceback.format_exc())
 
 
 class App(object):
