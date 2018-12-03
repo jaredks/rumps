@@ -20,7 +20,8 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage
+from AppKit import (NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage,
+                    NSSpeechSynthesizer)
 from PyObjCTools import AppHelper
 
 import inspect
@@ -46,7 +47,26 @@ def debug_mode(choice):
     else:
         def _log(*_):
             pass
+
+
 debug_mode(False)
+
+
+class SpeechSynthesizer:
+    """Wrapper for Objective-C's NSSpeechSynthesizer class.
+
+        Implements core functionality of speech in rumps.
+        """
+    def __init__(self, message):
+        self.synth = NSSpeechSynthesizer.alloc().initWithVoice_(None)
+        self.synth.startSpeakingString_(message)
+
+    def stop(self):
+        """
+        Stops the current speech, if speaking.
+        """
+        if self.synth.speaking:
+            self.synth.stopSpeaking()
 
 
 def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=None):
