@@ -1195,7 +1195,7 @@ class App(object):
             debug_mode(debug)
 
         nsapplication = NSApplication.sharedApplication()
-        nsapplication.activateIgnoringOtherApps_(False)  # NSAlerts in front
+        nsapplication.activateIgnoringOtherApps_(True)  # NSAlerts in front
         self._nsapp = NSApp.alloc().init()
         self._nsapp._app = self.__dict__  # allow for dynamic modification based on this App instance
         nsapplication.setDelegate_(self._nsapp)
