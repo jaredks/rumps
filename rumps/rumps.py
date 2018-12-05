@@ -1041,10 +1041,11 @@ class Preferences(object):
     """
     Provides access to a folder in the user's home directory, as well as a pickled key-value file.
     :param name: the name of the application.
+    :param path: a path to the folder being used to store the preferences file.
     """
 
-    def __init__(self, name):
-        self._path = preferences_path(name)
+    def __init__(self, name, path=None):
+        self._path = path if path else preferences_path(name)
         self._preferences = {}
         if os.path.exists(self._path):
             with open(self._path, "rb") as file:
