@@ -25,10 +25,14 @@ from PyObjCTools import AppHelper
 
 import inspect
 import os
-import pickle
 import sys
 import traceback
 import weakref
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle as pickle
 
 from collections import Mapping, Iterable
 from .utils import ListDict
@@ -210,6 +214,13 @@ def application_support(name):
     if not os.path.isdir(app_support_path):
         os.mkdir(app_support_path)
     return app_support_path
+
+
+def preferences_path(name):
+    home_dir = os.path.join(os.path.expanduser("~"), name)
+    if not os.path.exists(home_dir):
+        os.makedirs(home_dir)
+    return os.path.join(home_dir, "{}.prefs".format(name.lower().replace(" ", "").strip()))
 
 
 def timers():
@@ -1026,6 +1037,28 @@ class NSApp(NSObject):
             _log(traceback.format_exc())
 
 
+class Preferences(object):
+    """
+    Provides access to a folder in the user's home directory, as well as a pickled key-value file.
+    :param name: the name of the application.
+    """
+
+    def __init__(self, name):
+        self._path = preferences_path(name)
+        self._preferences = {}
+        if os.path.exists(self._path):
+            with open(self._path, "rb") as file:
+                self._preferences = pickle.load(file)
+
+    def get(self, key, default=None):
+        return self._preferences.get(key, default)
+
+    def set(self, key, value):
+        self._preferences[key] = value
+        with open(self._path, "wb") as file:
+            pickle.dump(self._preferences, file, 2)
+        print("Set preference %s to %s" % (key, repr(value)))
+
 class App(object):
     """Represents the statusbar application.
 
@@ -1064,6 +1097,7 @@ class App(object):
         if menu is not None:
             self.menu = menu
         self._application_support = application_support(self._name)
+        self.preferences = Preferences(self._name)
 
     # Properties
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
