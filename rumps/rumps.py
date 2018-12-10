@@ -704,6 +704,8 @@ class MenuItem(Menu):
 class SliderMenuItem(object):
     """Represents a slider menu item within the application's menu.
 
+    .. versionadded:: 0.3.0
+
     :param value: a number for the current position of the slider.
     :param min_value: a number for the minimum position to which a slider can be moved.
     :param max_value: a number for the maximum position to which a slider can be moved.
