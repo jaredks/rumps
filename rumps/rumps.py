@@ -297,6 +297,48 @@ def clicked(*args, **options):
     return decorator
 
 
+def slider(*args, **options):
+    """Decorator for registering a function as a callback for a slide action on a :class:`rumps.SliderMenuItem` within
+    the application. All elements of the provided path will be created as :class:`rumps.MenuItem` objects. The
+    :class:`rumps.SliderMenuItem` will be created as a child of the last menu item.
+
+    Accepts the same keyword arguments as :class:`rumps.SliderMenuItem`.
+
+    .. versionadded:: 0.3.0
+
+    :param args: a series of strings representing the path to a :class:`rumps.SliderMenuItem` in the main menu of the
+                 application.
+    """
+    def decorator(f):
+
+        def register_click(self):
+
+            # self not defined yet but will be later in 'run' method
+            menuitem = self._menu
+            if menuitem is None:
+                raise ValueError('no menu created')
+
+            # create here in case of error so we don't create the path
+            slider_menu_item = SliderMenuItem(**options)
+            slider_menu_item.set_callback(f)
+
+            for arg in args:
+                try:
+                    menuitem = menuitem[arg]
+                except KeyError:
+                    menuitem.add(arg)
+                    menuitem = menuitem[arg]
+
+            menuitem.add(slider_menu_item)
+
+        # delay registering the button until we have a current instance to be able to traverse the menu
+        buttons = clicked.__dict__.setdefault('*buttons', [])
+        buttons.append(register_click)
+
+        return f
+    return decorator
+
+
 def notifications(f):
     """Decorator for registering a function to serve as a "notification center" for the application. This function will
     receive the data associated with an incoming macOS notification sent using :func:`rumps.notification`. This occurs
@@ -341,7 +383,7 @@ class Menu(ListDict):
     _choose_key = object()
 
     def __init__(self):
-        self._separators = 1
+        self._counts = {}
         if not hasattr(self, '_menu'):
             self._menu = NSMenu.alloc().init()
         super(Menu, self).__init__()
@@ -457,22 +499,24 @@ class Menu(ListDict):
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def _process_new_menuitem(self, key, value):
-        if value is None:
-            value = separator
-
-        if value is not separator:
-            value = MenuItem(value)  # safely convert if not already MenuItem
-            if key is self._choose_key:
-                key = value.title
-            if key != value.title:
-                _log('WARNING: key {0} is not the same as the title of the corresponding MenuItem {1}; while this '
-                     'would occur if the title is dynamically altered, having different names at the time of menu '
-                     'creation may not be desired '.format(repr(key), repr(value.title)))
-        else:
+        if value is None or value is separator:
             value = SeparatorMenuItem()
-            if key is self._choose_key:
-                key = 'separator_' + str(self._separators)
-                self._separators += 1
+
+        if not hasattr(value, '_menuitem'):
+            value = MenuItem(value)
+
+        if key is self._choose_key:
+            if hasattr(value, 'title'):
+                key = value.title
+            else:
+                cls = type(value)
+                count = self._counts[cls] = self._counts.get(cls, 0) + 1
+                key = '%s_%d' % (cls.__name__, count)
+
+        if hasattr(value, 'title') and key != value.title:
+            _log('WARNING: key {0} is not the same as the title of the corresponding MenuItem {1}; while this '
+                 'would occur if the title is dynamically altered, having different names at the time of menu '
+                 'creation may not be desired '.format(repr(key), repr(value.title)))
 
         return key, value
 
@@ -657,40 +701,50 @@ class MenuItem(Menu):
         return self._menuitem.keyEquivalent()
 
 
-class SliderMenuItem(MenuItem):
+class SliderMenuItem(object):
+    """Represents a slider menu item within the application's menu.
 
-    def __new__(cls, *args, **kwargs):
-        if args and isinstance(args[0], SliderMenuItem):  # can safely wrap SliderMenuItem instances
-            return args[0]
-        return super(SliderMenuItem, cls).__new__(cls, *args, **kwargs)
+    :param value: a number for the current position of the slider.
+    :param min_value: a number for the minimum position to which a slider can be moved.
+    :param max_value: a number for the maximum position to which a slider can be moved.
+    :param callback: the function serving as callback for when a slide event occurs on this menu item.
+    :param dimensions: a sequence of numbers whose length is two, specifying the dimensions of the slider.
+    """
 
-    def __init__(self, title, value=50, min_value=0, max_value=100, callback=None, dimensions=(180, 15)):
-        if isinstance(title, SliderMenuItem):  # don't initialize already existing instances
-            return
+    def __init__(self, value=50, min_value=0, max_value=100, callback=None, dimensions=(180, 15)):
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(min_value)
         self._slider.setMaxValue_(max_value)
         self._slider.setValue_(value)
         self._slider.setFrameSize_(NSSize(*dimensions))
         self._slider.setTarget_(NSApp)
-        self.set_slider_callback(callback)
-        super(SliderMenuItem, self).__init__(title)
+        self._menuitem = NSMenuItem.alloc().init()
+        self._menuitem.setTarget_(NSApp)
         self._menuitem.setView_(self._slider)
+        self.set_callback(callback)
 
     def __repr__(self):
-        return '<{0}: [{1} -> {2}; callback: {3}]>'.format(type(self).__name__, repr(self._menuitem.title),
-                                                           list(map(str, self)), repr(self.sliderCallback))
+        return '<{0}: [value: {1}; callback: {2}]>'.format(
+            type(self).__name__,
+            self.value,
+            repr(self.callback)
+        )
 
-    def set_slider_callback(self, callback):
+    def set_callback(self, callback):
+        """Set the function serving as callback for when a slide event occurs on this menu item.
+
+        :param callback: the function to be called when the user drags the marker on the slider.
+        """
         NSApp._ns_to_py_and_callback[self._slider] = self, callback
         self._slider.setAction_('callback:' if callback is not None else None)
 
     @property
-    def sliderCallback(self):
+    def callback(self):
         return NSApp._ns_to_py_and_callback[self._slider][1]
 
     @property
     def value(self):
+        """The current position of the slider."""
         return self._slider.value()
 
     @value.setter
