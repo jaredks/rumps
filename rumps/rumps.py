@@ -14,17 +14,18 @@ import Foundation
 import AppKit
 
 try:
-    from Foundation import NSUserNotification, NSUserNotificationCenter, NSMutableDictionary
+    from Foundation import NSUserNotification, NSUserNotificationCenter
 except ImportError:
     _NOTIFICATIONS = False
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
-                        NSMakeRect, NSLog, NSObject, NSSize)
+                        NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString)
 from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider
 from PyObjCTools import AppHelper
 
 import inspect
 import os
+import pickle
 import sys
 import traceback
 import weakref
@@ -143,7 +144,8 @@ def _default_user_notification_center():
         return notification_center
 
 
-def notification(title, subtitle, message, data=None, sound=True):
+def notification(title, subtitle, message, data=None, sound=True, action_button=None, other_button=None,
+                 has_reply_button=False, icon=None):
     """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -157,21 +159,46 @@ def notification(title, subtitle, message, data=None, sound=True):
     :param data: will be passed to the application's "notification center" (see :func:`rumps.notifications`) when this
                  notification is clicked.
     :param sound: whether the notification should make a noise when it arrives.
+    :param action_button: title for the action button.
+    :param other_button: title for the other button.
+    :param has_reply_button: whether or not the notification has a reply button.
+    :param icon: the filename of an image for the notification's icon, will replace the default.
     """
     if not _NOTIFICATIONS:
         raise RuntimeError('OS X 10.8+ is required to send notifications')
+
     if data is not None and not isinstance(data, Mapping):
         raise TypeError('notification data must be a mapping')
+
     _require_string_or_none(title, subtitle, message)
+
     notification = NSUserNotification.alloc().init()
+
     notification.setTitle_(title)
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
-    infoDict = NSMutableDictionary.alloc().init()
-    infoDict.setDictionary_({} if data is None else data)
-    notification.setUserInfo_(infoDict)
+
+    if data is not None:
+        app = getattr(App, '*app_instance')
+        dumped = app.serializer.dumps(data)
+        ns_dict = NSMutableDictionary.alloc().init()
+        ns_string = NSString.alloc().initWithString_(dumped)
+        ns_dict.setDictionary_({'value': ns_string})
+        notification.setUserInfo_(ns_dict)
+
+    if icon is not None:
+        notification.set_identityImage_(_nsimage_from_file(icon))
     if sound:
         notification.setSoundName_("NSUserNotificationDefaultSoundName")
+    if action_button:
+        notification.setActionButtonTitle_(action_button)
+        notification.set_showsButtons_(True)
+    if other_button:
+        notification.setOtherButtonTitle_(other_button)
+        notification.set_showsButtons_(True)
+    if has_reply_button:
+        notification.setHasReplyButton_(True)
+
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
     notification_center = _default_user_notification_center()
     notification_center.scheduleNotification_(notification)
@@ -1036,7 +1063,14 @@ class NSApp(NSObject):
 
     def userNotificationCenter_didActivateNotification_(self, notification_center, notification):
         notification_center.removeDeliveredNotification_(notification)
-        data = dict(notification.userInfo())
+        ns_dict = notification.userInfo()
+        if ns_dict is None:
+            data = None
+        else:
+            dumped = ns_dict['value']
+            app = getattr(App, '*app_instance')
+            data = app.serializer.loads(dumped)
+
         try:
             notification_function = getattr(notifications, '*notification_center')
         except AttributeError:  # notification center function not specified -> no error but warning in log
@@ -1044,6 +1078,8 @@ class NSApp(NSObject):
                  'decorator to register a function.')
         else:
             try:
+                data['activationType'] = notification.activationType()
+                data['actualDeliveryDate'] = notification.actualDeliveryDate()
                 _call_as_function_or_method(notification_function, data)
             except Exception:
                 _log(traceback.format_exc())
@@ -1109,6 +1145,9 @@ class App(object):
     # NOTE:
     # Serves as a setup class for NSApp since Objective-C classes shouldn't be instantiated normally.
     # This is the most user-friendly way.
+
+    #: A serializer for notification data.  The default is pickle.
+    serializer = pickle
 
     def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit'):
         _require_string(name)

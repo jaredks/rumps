@@ -126,80 +126,401 @@ License
 Works Made With rumps
 ---------------------
 
-`allofthelights
+`20twenty20 - eohomegrownapps
+<https://github.com/eohomegrownapps/20twenty20/>`_
+
+`42-CanITakeCoffee - avallete
+<https://github.com/avallete/42-CanITakeCoffee/>`_
+
+`air-quality-app - grtfou
+<https://github.com/grtfou/air-quality-app/>`_
+
+`Airplane - C-Codes
+<https://github.com/C-Codes/Airplane/>`_
+
+`allbar - raphaelhuefner
+<https://github.com/raphaelhuefner/allbar/>`_
+
+`allofthelights - kenkeiter
 <https://github.com/kenkeiter/allofthelights/>`_
 
-`attendee-tool-mlh
+`attendee-tool-mlh - Bucknalla
 <https://github.com/Bucknalla/attendee-tool-mlh/>`_
 
-`bundle-checker
+`Auroratain - Matt-McConway
+<https://github.com/Matt-McConway/Auroratain/>`_
+
+`AutoSSP - viktyz
+<https://github.com/viktyz/AutoSSP/>`_
+
+`AutoVPN - shadyabhi
+<https://github.com/shadyabhi/AutoVPN/>`_
+
+`BackgroundsForReddit - karlaugsten
+<https://github.com/karlaugsten/BackgroundsForReddit/>`_
+
+`bink - e40
+<https://github.com/e40/bink/>`_
+
+`bitracker - JZChen
+<https://github.com/JZChen/bitracker/>`_
+
+`BluetoothEvent - lostman-github
+<https://github.com/lostman-github/BluetoothEvent/>`_
+
+`break-timer - jjmojojjmojo
+<https://github.com/jjmojojjmojo/break-timer/>`_
+
+`breaker - amloewi
+<https://github.com/amloewi/breaker/>`_
+
+`bundle-checker - jeffgodwyll
 <https://github.com/jeffgodwyll/bundle-checker/>`_
 
-`c1t1
+`c1t1 - e9t
 <https://github.com/e9t/c1t1/>`_
 
-`commitwatch
+`camsketch - pdubroy
+<https://github.com/pdubroy/camsketch/>`_
+
+`ComicStreamer - beville
+<https://github.com/beville/ComicStreamer/>`_
+
+`commitwatch - chrisfosterelli
 <https://github.com/chrisfosterelli/commitwatch/>`_
 
-`cryptocoin-quotes
+`computer-time - rbrich
+<https://github.com/rbrich/computer-time/>`_
+
+`crypto-ticker-macOS - mqulateen
+<https://github.com/mqulateen/crypto-ticker-macOS/>`_
+
+`cryptocoin-quotes - Sayan98
 <https://github.com/Sayan98/cryptocoin-quotes/>`_
 
-`dns.app
+`cuco - jjuanda
+<https://github.com/jjuanda/cuco/>`_
+
+`currency-converter - ahmedelgohary
+<https://github.com/ahmedelgohary/currency-converter/>`_
+
+`dns.app - damln
 <https://github.com/damln/dns.app/>`_
 
-`HalfCaff
+`Dokky - rogierkn
+<https://github.com/rogierkn/Dokky/>`_
+
+`dolar_bitcoin - celis
+<https://github.com/celis/dolar_bitcoin/>`_
+
+`duplicati - duplicati
+<https://github.com/duplicati/duplicati/>`_
+
+`earth - nickrobson
+<https://github.com/nickrobson/earth/>`_
+
+`ForceNapClone - hroftgit
+<https://github.com/hroftgit/ForceNapClone/>`_
+
+`freelan-bar - privacee
+<https://github.com/privacee/freelan-bar/>`_
+
+`g-assistant-mac - agucova
+<https://github.com/agucova/g-assistant-mac/>`_
+
+`gapa - ozlerhakan
+<https://github.com/ozlerhakan/gapa/>`_
+
+`GitSyncApp - jachin
+<https://github.com/jachin/GitSyncApp/>`_
+
+`Gumpy - RobGraham
+<https://github.com/RobGraham/Gumpy/>`_
+
+`Habitus - kmundnic
+<https://github.com/kmundnic/Habitus/>`_
+
+`HalfCaff - dougn
 <https://github.com/dougn/HalfCaff/>`_
 
-`harmenubar
+`happymac - laffra
+<https://github.com/laffra/happymac/>`_
+
+`harmenubar - vekkt0r
 <https://github.com/vekkt0r/harmenubar/>`_
 
-`HipStatus
+`hatarake - kfdm-archive
+<https://github.com/kfdm-archive/hatarake/>`_
+
+`HipStatus - jamfit
 <https://github.com/jamfit/HipStatus/>`_
 
-`idiot
+`hp-lorem - jamesrampton
+<https://github.com/jamesrampton/hp-lorem/>`_
+
+`hs100-status-bar - craig-davis
+<https://github.com/craig-davis/hs100-status-bar/>`_
+
+`iBrew - Tristan79
+<https://github.com/Tristan79/iBrew/>`_
+
+`idiot - snare
 <https://github.com/snare/idiot/>`_
 
-`LifxController
+`interlocking - jrauch
+<https://github.com/jrauch/interlocking/>`_
+
+`istat - Lingdu0
+<https://github.com/Lingdu0/istat/>`_
+
+`keynote_snap - sasn0
+<https://github.com/sasn0/keynote_snap/>`_
+
+`Keypad - jelmer04
+<https://github.com/jelmer04/Keypad/>`_
+
+`keyringo - tokenizecx
+<https://github.com/tokenizecx/keyringo/>`_
+
+`kizkiz - TkTech
+<https://github.com/TkTech/kizkiz/>`_
+
+`koinex-status-ticker - kirantambe
+<https://github.com/kirantambe/koinex-status-ticker/>`_
+
+`leaguefriend - pandarison
+<https://github.com/pandarison/leaguefriend/>`_
+
+`LifxController - mitchmcdee
 <https://github.com/mitchmcdee/LifxController/>`_
 
-`mac-shrew
+`lil_ip_toolbar - mchlrtkwski
+<https://github.com/mchlrtkwski/lil_ip_toolbar/>`_
+
+`mac-shrew - mejmo
 <https://github.com/mejmo/mac-shrew/>`_
 
-`narcissist
+`MacFaceID - vkalia602
+<https://github.com/vkalia602/MacFaceID/>`_
+
+`majo-v - r4lv
+<https://github.com/r4lv/majo-v/>`_
+
+`MBatteryApp - Elliot-Potts
+<https://github.com/Elliot-Potts/MBatteryApp/>`_
+
+`McBing - bagabont
+<https://github.com/bagabont/McBing/>`_
+
+`Memcode - aroraenterprise
+<https://github.com/aroraenterprise/Memcode/>`_
+
+`memdam - joshalbrecht
+<https://github.com/joshalbrecht/memdam/>`_
+
+`MenuBarGmail - rcmdnk
+<https://github.com/rcmdnk/MenuBarGmail/>`_
+
+`midi2dmx - davidbistolas
+<https://github.com/davidbistolas/midi2dmx/>`_
+
+`monero-ticker - Cisplatin
+<https://github.com/Cisplatin/monero-ticker/>`_
+
+`MoodLight - kretash
+<https://github.com/kretash/MoodLight/>`_
+
+`MoonTicker - skxu
+<https://github.com/skxu/MoonTicker/>`_
+
+`musicbar - russelg
+<https://github.com/russelg/musicbar/>`_
+
+`narcissist - helmholtz
 <https://github.com/helmholtz/narcissist/>`_
 
-`osx-bamboo-plan-status
+`Noise-Line - Dnncha
+<https://github.com/Dnncha/Noise-Line/>`_
+
+`obmenka - vlakin
+<https://github.com/vlakin/obmenka/>`_
+
+`org-clock-dashboard - srid
+<https://github.com/srid/org-clock-dashboard/>`_
+
+`osx-bamboo-plan-status - spalter
 <https://github.com/spalter/osx-bamboo-plan-status/>`_
 
-`py-Timey
+`osx-myair - CameronEx
+<https://github.com/CameronEx/osx-myair/>`_
+
+`PennAppsX - yousufmsoliman
+<https://github.com/yousufmsoliman/PennAppsX/>`_
+
+`phd - ChrisCummins
+<https://github.com/ChrisCummins/phd/>`_
+
+`pokemon-go-status - pboardman
+<https://github.com/pboardman/pokemon-go-status/>`_
+
+`polly - interrogator
+<https://github.com/interrogator/polly/>`_
+
+`pompy - camilopayan
+<https://github.com/camilopayan/pompy/>`_
+
+`project_screen_to_lifx - emiraga
+<https://github.com/emiraga/project_screen_to_lifx/>`_
+
+`PSPEWC-mac - jacquesCedric
+<https://github.com/jacquesCedric/PSPEWC-mac/>`_
+
+`py-Timey - asakasinsky
 <https://github.com/asakasinsky/py-Timey/>`_
 
-`pySplash
+`pymodoro - volflow
+<https://github.com/volflow/pymodoro/>`_
+
+`pySplash - Egregors
 <https://github.com/Egregors/pySplash/>`_
 
-`rideindegochecker
+`quick-grayscale - shubhamjain
+<https://github.com/shubhamjain/quick-grayscale/>`_
+
+`quiet - hiroshi
+<https://github.com/hiroshi/quiet/>`_
+
+`Radio-Crowd - EliMendelson
+<https://github.com/EliMendelson/Radio-Crowd/>`_
+
+`RadioBar - wass3r
+<https://github.com/wass3r/RadioBar/>`_
+
+`rescuetime_statusbar - MauriceZ
+<https://github.com/MauriceZ/rescuetime_statusbar/>`_
+
+`rideindegochecker - josepvalls
 <https://github.com/josepvalls/rideindegochecker/>`_
 
-`slack-status-bar
+`RitsWifi - fang2hou
+<https://github.com/fang2hou/RitsWifi/>`_
+
+`safety-bar - pyupio
+<https://github.com/pyupio/safety-bar/>`_
+
+`SAT-Vocab-Quizzer - Legoben
+<https://github.com/Legoben/SAT-Vocab-Quizzer/>`_
+
+`sharfoo - furqan-shakoor
+<https://github.com/furqan-shakoor/sharfoo/>`_
+
+`shotput - amussey
+<https://github.com/amussey/shotput/>`_
+
+`SingMenuData - ponyfleisch
+<https://github.com/ponyfleisch/SingMenuData/>`_
+
+`slack-status-bar - ericwb
 <https://github.com/ericwb/slack-status-bar/>`_
 
-`sonostus
+`slackify - nikodraca
+<https://github.com/nikodraca/slackify/>`_
+
+`snippets - quillford
+<https://github.com/quillford/snippets/>`_
+
+`sonostus - sarkkine
 <https://github.com/sarkkine/sonostus/>`_
 
-`SpotifyLyrics
+`Spaceapi-Desktop - UrLab
+<https://github.com/UrLab/Spaceapi-Desktop/>`_
+
+`SpaceSwitcher - SankaitLaroiya
+<https://github.com/SankaitLaroiya/SpaceSwitcher/>`_
+
+`SpotifyLyrics - yask123
 <https://github.com/yask123/SpotifyLyrics/>`_
 
-`umma
+`steemticker-osx - ZachC16
+<https://github.com/ZachC16/steemticker-osx/>`_
+
+`Telkom-ADSL-Data-Usage - parautenbach
+<https://github.com/parautenbach/Telkom-ADSL-Data-Usage/>`_
+
+`Telton - Yywww
+<https://github.com/Yywww/Telton/>`_
+
+`these-days - hahayes
+<https://github.com/hahayes/these-days/>`_
+
+`time-tracking - willsgrigg
+<https://github.com/willsgrigg/time-tracking/>`_
+
+`timerbar - uberalex
+<https://github.com/uberalex/timerbar/>`_
+
+`tracker - jtxx000
+<https://github.com/jtxx000/tracker/>`_
+
+`umma - mankoff
 <https://github.com/mankoff/umma/>`_
 
-`WallpDesk
+`upbrew - stchris
+<https://github.com/stchris/upbrew/>`_
+
+`uptimeIndicator - paulaborde
+<https://github.com/paulaborde/uptimeIndicator/>`_
+
+`urstatus - kysely
+<https://github.com/kysely/urstatus/>`_
+
+`uStatus - kdungs
+<https://github.com/kdungs/uStatus/>`_
+
+`VagrantBar - kingsdigitallab
+<https://github.com/kingsdigitallab/VagrantBar/>`_
+
+`voiceplay - tb0hdan
+<https://github.com/tb0hdan/voiceplay/>`_
+
+`volsbb - akigugale
+<https://github.com/akigugale/volsbb/>`_
+
+`Volumio_bar - volderette
+<https://github.com/volderette/Volumio_bar/>`_
+
+`votingpowerbar - therealwolf42
+<https://github.com/therealwolf42/votingpowerbar/>`_
+
+`WallpDesk - L3rchal
 <https://github.com/L3rchal/WallpDesk/>`_
 
-`WhyFi
+`webcronic - josselinauguste
+<https://github.com/josselinauguste/webcronic/>`_
+
+`Whale - amka
+<https://github.com/amka/Whale/>`_
+
+`WhyFi - OzTamir
 <https://github.com/OzTamir/WhyFi/>`_
 
-`WordTime
+`WordTime - Demonstrandum
 <https://github.com/Demonstrandum/WordTime/>`_
+
+`work_time_percent_applet - Benhgift
+<https://github.com/Benhgift/work_time_percent_applet/>`_
+
+`WorkWise - 8ern4ard
+<https://github.com/8ern4ard/WorkWise/>`_
+
+`xCodea - lowne
+<https://github.com/lowne/xCodea/>`_
+
+`yaca - drproteus
+<https://github.com/drproteus/yaca/>`_
+
+`Zero - beejhuff
+<https://github.com/beejhuff/Zero/>`_
 
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
