@@ -369,6 +369,7 @@ class Menu(ListDict):
 
     def __init__(self):
         self._separators = 1
+        self._menu_key = None
         if not hasattr(self, '_menu'):
             self._menu = NSMenu.alloc().init()
         super(Menu, self).__init__()
@@ -388,7 +389,7 @@ class Menu(ListDict):
         """Adds the object to the menu as a :class:`rumps.MenuItem` using the :attr:`rumps.MenuItem.title` as the
         key. `menuitem` will be converted to a `MenuItem` object if not one already.
         """
-        self.__setitem__(self._choose_key, menuitem)
+        self.__setitem__(self._choose_or_get_key, menuitem)
 
     def clear(self):
         """Remove all `MenuItem` objects from within the menu of this `MenuItem`."""
@@ -459,7 +460,7 @@ class Menu(ListDict):
         :param existing_key: a string key for an existing `MenuItem` value.
         :param menuitem: an object to be added. It will be converted to a `MenuItem` if not one already.
         """
-        key, menuitem = self._process_new_menuitem(self._choose_key, menuitem)
+        key, menuitem = self._process_new_menuitem(self._choose_or_get_key, menuitem)
         self._insert_helper(existing_key, key, menuitem, 1)
         super(Menu, self).insert_after(existing_key, (key, menuitem))
 
@@ -469,7 +470,7 @@ class Menu(ListDict):
         :param existing_key: a string key for an existing `MenuItem` value.
         :param menuitem: an object to be added. It will be converted to a `MenuItem` if not one already.
         """
-        key, menuitem = self._process_new_menuitem(self._choose_key, menuitem)
+        key, menuitem = self._process_new_menuitem(self._choose_or_get_key, menuitem)
         self._insert_helper(existing_key, key, menuitem, 0)
         super(Menu, self).insert_before(existing_key, (key, menuitem))
 
@@ -489,7 +490,7 @@ class Menu(ListDict):
 
         if value is not separator:
             value = MenuItem(value)  # safely convert if not already MenuItem
-            if key is self._choose_key:
+            if key is self._choose_or_get_key:
                 key = value.title
             if key != value.title:
                 _log('WARNING: key {0} is not the same as the title of the corresponding MenuItem {1}; while this '
@@ -497,11 +498,14 @@ class Menu(ListDict):
                      'creation may not be desired '.format(repr(key), repr(value.title)))
         else:
             value = SeparatorMenuItem()
-            if key is self._choose_key:
+            if key is self._choose_or_get_key:
                 key = 'separator_' + str(self._separators)
                 self._separators += 1
 
         return key, value
+
+    def _choose_or_get_key(self):
+        return self._menu_key if self._menu_key else self._choose_key
 
 
 class MenuItem(Menu):
@@ -522,7 +526,7 @@ class MenuItem(Menu):
     after other specified ones.
 
     .. note::
-       When adding a `MenuItem` instance to a menu, the value of :attr:`title` at that time will serve as its key for
+       When adding a `MenuItem` instance to a menu, the value of :attr:`title`, or :attr:`menu_key` if set, at that time will serve as its key for
        lookup performed on menus even if the `title` changes during program execution.
 
     :param title: the name of this menu item. If not a string, will use the string representation of the object.
@@ -531,6 +535,8 @@ class MenuItem(Menu):
     :param icon: a path to an image. If set to ``None``, the current image (if any) is removed.
     :param dimensions: a sequence of numbers whose length is two, specifying the dimensions of the icon.
     :param template: a boolean, specifying template mode for a given icon (proper b/w display in dark menu bar)
+    :param menu_key: the key of this menu item in its parent menu. If not a string, will use the string representation
+     of the object.
     """
 
     # NOTE:
@@ -547,7 +553,7 @@ class MenuItem(Menu):
             return args[0]
         return super(MenuItem, cls).__new__(cls, *args, **kwargs)
 
-    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None, template=None):
+    def __init__(self, title, callback=None, key=None, icon=None, dimensions=None, template=None, menu_key=None):
         if isinstance(title, MenuItem):  # don't initialize already existing instances
             return
         self._menuitem = NSMenuItem.alloc().initWithTitle_action_keyEquivalent_(text_type(title), None, '')
@@ -556,6 +562,7 @@ class MenuItem(Menu):
         self.set_callback(callback, key)
         self._template = template
         self.set_icon(icon, dimensions, template)
+        self._menu_key = menu_key
         super(MenuItem, self).__init__()
 
     def __setitem__(self, key, value):
@@ -579,6 +586,14 @@ class MenuItem(Menu):
     def title(self, new_title):
         new_title = text_type(new_title)
         self._menuitem.setTitle_(new_title)
+
+    @property
+    def menu_key(self):
+        """The text used as a key when storing this menu item as a dictionary. If not a string, will use the string representation of the
+        object.
+        .. versionadded:: 0.2.1
+        """
+        return self._menu_key
 
     @property
     def icon(self):
