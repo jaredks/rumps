@@ -5,6 +5,7 @@
 # Copyright: (c) 2017, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+from functools import wraps
 
 _NOTIFICATIONS = True
 
@@ -282,6 +283,41 @@ def timer(interval):
     return decorator
 
 
+class _ClickedProxy(object):
+    """
+    Replaces a function or a method decorated with :func:`clicked`
+    and allows both transparent function calls as well as access to :class:`rumps.MenuItem` instance
+    through :meth:`rumps._ClickedProxy.menuitem`.
+
+    See `examples/example_init.py` for usage.
+    """
+    def __init__(self, fn):
+        """
+        Proxy that transparently
+        :param fn:
+        """
+        self._fn = fn
+        self._menuitem = None
+
+    @property
+    def menuitem(self):
+        """
+        :returns: :class:`MenuItem` instance, or `None` in case of proxy has not yet been initialized
+        """
+        return self._menuitem
+
+    @menuitem.setter
+    def menuitem(self, value):
+        """
+        Sets MenuItem instance.
+        :param value: :class:`MenuItem` instance
+        """
+        self._menuitem = value
+
+    def __call__(self, *args, **kwargs):
+        return self._fn(*args, **kwargs)
+
+
 def clicked(*args, **options):
     """Decorator for registering a function as a callback for a click action on a :class:`rumps.MenuItem` within the
     application. The passed `args` must specify an existing path in the main menu. The :class:`rumps.MenuItem`
@@ -301,8 +337,10 @@ def clicked(*args, **options):
     :param args: a series of strings representing the path to a :class:`rumps.MenuItem` in the main menu of the
                  application.
     :param key: a string representing the key shortcut as an alternative means of clicking the menu item.
+    :returns: A :class:`rumps._ClickedProxy` that allows to access menu items
     """
     def decorator(f):
+        callback_proxy = wraps(f)(_ClickedProxy(f))
 
         def register_click(self):
             menuitem = self._menu  # self not defined yet but will be later in 'run' method
@@ -315,12 +353,13 @@ def clicked(*args, **options):
                     menuitem.add(arg)
                     menuitem = menuitem[arg]
             menuitem.set_callback(f, options.get('key'))
+            callback_proxy.menuitem = menuitem
 
         # delay registering the button until we have a current instance to be able to traverse the menu
         buttons = clicked.__dict__.setdefault('*buttons', [])
         buttons.append(register_click)
 
-        return f
+        return callback_proxy
     return decorator
 
 
@@ -1149,7 +1188,8 @@ class App(object):
     #: A serializer for notification data.  The default is pickle.
     serializer = pickle
 
-    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit'):
+    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit',
+                 on_before_event_loop=None):
         _require_string(name)
         self._name = name
         self._icon = self._icon_nsimage = self._title = None
@@ -1157,6 +1197,7 @@ class App(object):
         self.icon = icon
         self.title = title
         self.quit_button = quit_button
+        self._on_before_event_loop = on_before_event_loop
         self._menu = Menu()
         if menu is not None:
             self.menu = menu
@@ -1325,5 +1366,12 @@ class App(object):
         del t, b
 
         self._nsapp.initializeStatusBar()
-
+        self.on_before_event_loop()
         AppHelper.runEventLoop()
+
+    def on_before_event_loop(self):
+        """
+        This would be called right before the start of the event loop (:meth:`PyObjCTools.AppHelper.runEventLoop`).
+        """
+        if self._on_before_event_loop is not None:
+            self._on_before_event_loop()
