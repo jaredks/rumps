@@ -57,7 +57,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `title` is no longer
         a required parameter.
 
-    .. versionchanged:: 0.2.3
+    .. versionchanged:: 0.3.0
         Add `other` button functionality as well as `icon_path` to change the alert icon.
 
     :param title: the text positioned at the top of the window in larger font. If ``None``, a default localized title
@@ -872,7 +872,7 @@ class Window(object):
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `message` is no
         longer a required parameter.
 
-    .. versionchanged:: 0.2.3
+    .. versionchanged:: 0.3.0
         Add `secure` text input field functionality.
 
     :param message: the text positioned below the `title` in smaller font. If not a string, will use the string

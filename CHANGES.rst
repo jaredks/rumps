@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.3.0 (2019-02-01)
+------------------
+
+- Fix passing data in notifications
+- Add `other` and `icon_path` options to ``alert``
+- Add `secure` option to ``Window``
+- Add `action_button`, `other_button`, and `reply_button` options to ``notification``
+- Add ``slider``
+
+
 0.2.2 (2017-04-26)
 ------------------
 
