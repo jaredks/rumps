@@ -20,7 +20,7 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize
 from PyObjCTools import AppHelper
 
 import inspect
