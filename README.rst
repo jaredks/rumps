@@ -396,6 +396,9 @@ Works Made With rumps
 `RadioBar - wass3r
 <https://github.com/wass3r/RadioBar/>`_
 
+`RadioBar (fork) - mdbraber
+<https://github.com/mdbraber/radiobar/>`_
+
 `rescuetime_statusbar - MauriceZ
 <https://github.com/MauriceZ/rescuetime_statusbar/>`_
 
