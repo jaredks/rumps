@@ -31,7 +31,7 @@ with open('rumps/__init__.py') as f:
 setup(
     name='rumps',
     version=version,
-    description='Ridiculously Uncomplicated Mac os x Python Statusbar apps.',
+    description='Ridiculously Uncomplicated MacOS Python Statusbar apps.',
     author='Jared Suttles',
     url='https://github.com/jaredks/rumps',
     packages=['rumps', 'rumps.packages'],
