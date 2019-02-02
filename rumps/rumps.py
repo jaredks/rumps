@@ -20,7 +20,7 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification
 from PyObjCTools import AppHelper
 
 import inspect
@@ -1112,6 +1112,32 @@ class NSApp(NSObject):
     def fallbackOnName(self):
         if not (self.nsstatusitem.title() or self.nsstatusitem.image()):
             self.nsstatusitem.setTitle_(self._app['_name'])
+
+    def applicationDidFinishLaunching_(self, notification):
+        workspace          = NSWorkspace.sharedWorkspace()
+        notificationCenter = workspace.notificationCenter()
+        notificationCenter.addObserver_selector_name_object_(
+            self,
+            self.receiveSleepNotification_,
+            NSWorkspaceWillSleepNotification,
+            None
+        )
+        notificationCenter.addObserver_selector_name_object_(
+            self,
+            self.receiveWakeNotification_,
+            NSWorkspaceDidWakeNotification,
+            None
+        )
+
+    def receiveSleepNotification_(self, notification):
+        _log("receiveSleepNotification")
+        app = getattr(App, '*app_instance')
+        return app.sleep()
+
+    def receiveWakeNotification_(self, notification):
+        _log("receiveWakeNotification")
+        app = getattr(App, '*app_instance')
+        return app.wake()
 
     @classmethod
     def callback_(cls, nsmenuitem):
