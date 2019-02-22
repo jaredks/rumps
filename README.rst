@@ -525,5 +525,8 @@ Works Made With rumps
 `Zero - beejhuff
 <https://github.com/beejhuff/Zero/>`_
 
+`sb-translate - leandroltavares
+<https://github.com/leandroltavares/sb-translate>`_
+
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
