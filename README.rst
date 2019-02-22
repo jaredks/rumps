@@ -414,6 +414,9 @@ Works Made With rumps
 `SAT-Vocab-Quizzer - Legoben
 <https://github.com/Legoben/SAT-Vocab-Quizzer/>`_
 
+`sb-translate - leandroltavares
+<https://github.com/leandroltavares/sb-translate>`_
+
 `sharfoo - furqan-shakoor
 <https://github.com/furqan-shakoor/sharfoo/>`_
 
@@ -524,9 +527,6 @@ Works Made With rumps
 
 `Zero - beejhuff
 <https://github.com/beejhuff/Zero/>`_
-
-`sb-translate - leandroltavares
-<https://github.com/leandroltavares/sb-translate>`_
 
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
