@@ -744,7 +744,7 @@ class SliderMenuItem(object):
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(min_value)
         self._slider.setMaxValue_(max_value)
-        self._slider.setValue_(value)
+        self._slider.setDoubleValue_(value)
         self._slider.setFrameSize_(NSSize(*dimensions))
         self._slider.setTarget_(NSApp)
         self._menuitem = NSMenuItem.alloc().init()
@@ -774,11 +774,11 @@ class SliderMenuItem(object):
     @property
     def value(self):
         """The current position of the slider."""
-        return self._slider.value()
+        return self._slider.doubleValue()
 
     @value.setter
     def value(self, new_value):
-        self._slider.setValue_(new_value)
+        self._slider.setDoubleValue_(new_value)
 
 
 class SeparatorMenuItem(object):

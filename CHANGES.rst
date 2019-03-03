@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.3.0.dev
+---------
+
+- Fix slider for some older macOS versions (10.11 and before?)
+
+
 0.3.0 (2019-02-01)
 ------------------
 
