@@ -1352,4 +1352,5 @@ class App(object):
 
         self._nsapp.initializeStatusBar()
 
+        AppHelper.installMachInterrupt()
         AppHelper.runEventLoop()

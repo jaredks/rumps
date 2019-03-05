@@ -5,6 +5,7 @@ Changes
 ---------
 
 - Fix slider for some older macOS versions (10.11 and before?)
+- Keyboard interrupts now stop a running application
 
 
 0.3.0 (2019-02-01)
