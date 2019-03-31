@@ -342,6 +342,9 @@ Works Made With rumps
 `Noise-Line - Dnncha
 <https://github.com/Dnncha/Noise-Line/>`_
 
+`nowplaying_statusbar - MataiulS
+<https://github.com/MataiulS/nowplaying>`_
+
 `obmenka - vlakin
 <https://github.com/vlakin/obmenka/>`_
 
