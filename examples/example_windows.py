@@ -6,9 +6,8 @@ window.message = 'Something.'
 window.default_text = 'eh'
 
 response = window.run()
-print response
+print (response)
 
 window.add_buttons('One', 'Two', 'Three')
 
-print window.run()
-print response
+print (window.run())
