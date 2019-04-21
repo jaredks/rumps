@@ -115,12 +115,12 @@ Both of which will require ``sudo`` if installing in a system-wide location.
 Virtual Environments
 --------------------
 
-There are issues with using `virtualenv` because of the way the Python
-executable is copied. Although `rumps` attempts to apply a fix (hack) during
-the install process, it is not suggested to use `virtualenv`.
+There are issues with using ``virtualenv`` because of the way the Python
+executable is copied. Although ``rumps`` attempts to apply a fix (hack) during
+the install process, it is not suggested to use ``virtualenv``.
 
-To ensure proper functionality, either use `venv` (packaged with Python 3) or
-create a standalone app using `py2app`.
+To ensure proper functionality, either use ``venv`` (packaged with Python 3) or
+create a standalone app using ``py2app``.
 
 .. code-block:: bash
 
