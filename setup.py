@@ -38,7 +38,15 @@ setup(
     package_data={'': ['LICENSE']},
     long_description=readme + '\n\n' + changes,
     license='BSD License',
-    install_requires=['pyobjc-framework-Cocoa'],
+    install_requires=[
+        'pyobjc-framework-Cocoa'
+    ],
+    extras_require={
+        'dev': [
+            'pytest>=4.3',
+            'tox>=3.8'
+        ]
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: MacOS X',
