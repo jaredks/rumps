@@ -1,7 +1,10 @@
 #!/usr/bin/env python
+
+import errno
 import os
 import re
 import sys
+import traceback
 
 from setuptools import setup
 
@@ -15,11 +18,20 @@ INFO_PLIST_TEMPLATE = '''\
 </dict>
 </plist>
 '''
-try:
-    with open(os.path.join(os.path.dirname(sys.executable), 'Info.plist'), 'w') as f:
+
+
+def fix_virtualenv():
+    executable_dir = os.path.dirname(sys.executable)
+
+    try:
+        os.mkdir(os.path.join(executable_dir, 'Contents'))
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    with open(os.path.join(executable_dir, 'Contents', 'Info.plist'), 'w') as f:
         f.write(INFO_PLIST_TEMPLATE % {'name': 'rumps'})
-except IOError:
-    pass
+
 
 with open('README.rst') as f:
     readme = f.read()
@@ -59,3 +71,31 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 )
+
+# if this looks like a virtualenv
+if hasattr(sys, 'real_prefix'):
+    print('=' * 64)
+    print(
+        '\n'
+        'It looks like we are inside a virtualenv. Attempting to apply fix.\n'
+    )
+    try:
+        fix_virtualenv()
+    except Exception:
+        traceback.print_exc()
+        print(
+            'WARNING: Could not fix virtualenv. UI interaction likely will '
+            'not function properly.\n'
+        )
+    else:
+        print(
+            'Applied best-effort fix for virtualenv to support proper UI '
+            'interaction.\n'
+        )
+    print(
+        'Use of venv is suggested for creating virtual environments:'
+        '\n\n'
+        '    python3 -m venv env'
+        '\n'
+    )
+    print('=' * 64)
