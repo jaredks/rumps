@@ -5,6 +5,7 @@
 # Copyright: (c) 2017, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+from functools import wraps
 
 _NOTIFICATIONS = True
 
@@ -315,6 +316,7 @@ def clicked(*args, **options):
                     menuitem.add(arg)
                     menuitem = menuitem[arg]
             menuitem.set_callback(f, options.get('key'))
+            setattr(f, 'menuitem', menuitem)
 
         # delay registering the button until we have a current instance to be able to traverse the menu
         buttons = clicked.__dict__.setdefault('*buttons', [])
@@ -1175,7 +1177,8 @@ class App(object):
     #: A serializer for notification data.  The default is pickle.
     serializer = pickle
 
-    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit'):
+    def __init__(self, name, title=None, icon=None, template=None, menu=None, quit_button='Quit',
+                 on_before_event_loop=None):
         _require_string(name)
         self._name = name
         self._icon = self._icon_nsimage = self._title = None
@@ -1183,6 +1186,7 @@ class App(object):
         self.icon = icon
         self.title = title
         self.quit_button = quit_button
+        self._on_before_event_loop = on_before_event_loop
         self._menu = Menu()
         if menu is not None:
             self.menu = menu
@@ -1351,6 +1355,14 @@ class App(object):
         del t, b
 
         self._nsapp.initializeStatusBar()
+        self.on_before_event_loop()
 
         AppHelper.installMachInterrupt()
         AppHelper.runEventLoop()
+
+    def on_before_event_loop(self):
+        """
+        This would be called right before the start of the event loop (:meth:`PyObjCTools.AppHelper.runEventLoop`).
+        """
+        if self._on_before_event_loop is not None:
+            self._on_before_event_loop()

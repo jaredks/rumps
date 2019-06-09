@@ -3,3 +3,5 @@ dist/
 *.py[co]
 
 .idea/
+*.egg-info
+venv/
