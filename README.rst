@@ -112,6 +112,21 @@ Or from source,
 Both of which will require ``sudo`` if installing in a system-wide location.
 
 
+Virtual Environments
+--------------------
+
+There are issues with using ``virtualenv`` because of the way the Python
+executable is copied. Although ``rumps`` attempts to apply a fix (hack) during
+the install process, it is not suggested to use ``virtualenv``.
+
+To ensure proper functionality, either use ``venv`` (packaged with Python 3) or
+create a standalone app using ``py2app``.
+
+.. code-block:: bash
+
+    python3 -m venv env
+
+
 Documentation
 -------------
 
@@ -342,6 +357,9 @@ Works Made With rumps
 `Noise-Line - Dnncha
 <https://github.com/Dnncha/Noise-Line/>`_
 
+`nowplaying_statusbar - MataiulS
+<https://github.com/MataiulS/nowplaying>`_
+
 `obmenka - vlakin
 <https://github.com/vlakin/obmenka/>`_
 
@@ -396,6 +414,9 @@ Works Made With rumps
 `RadioBar - wass3r
 <https://github.com/wass3r/RadioBar/>`_
 
+`RadioBar (fork) - mdbraber
+<https://github.com/mdbraber/radiobar/>`_
+
 `rescuetime_statusbar - MauriceZ
 <https://github.com/MauriceZ/rescuetime_statusbar/>`_
 
@@ -410,6 +431,9 @@ Works Made With rumps
 
 `SAT-Vocab-Quizzer - Legoben
 <https://github.com/Legoben/SAT-Vocab-Quizzer/>`_
+
+`sb-translate - leandroltavares
+<https://github.com/leandroltavares/sb-translate>`_
 
 `sharfoo - furqan-shakoor
 <https://github.com/furqan-shakoor/sharfoo/>`_

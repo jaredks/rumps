@@ -21,7 +21,7 @@ except ImportError:
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification
 from PyObjCTools import AppHelper
 
 import inspect
@@ -58,7 +58,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `title` is no longer
         a required parameter.
 
-    .. versionchanged:: 0.2.3
+    .. versionchanged:: 0.3.0
         Add `other` button functionality as well as `icon_path` to change the alert icon.
 
     :param title: the text positioned at the top of the window in larger font. If ``None``, a default localized title
@@ -746,7 +746,7 @@ class SliderMenuItem(object):
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(min_value)
         self._slider.setMaxValue_(max_value)
-        self._slider.setValue_(value)
+        self._slider.setDoubleValue_(value)
         self._slider.setFrameSize_(NSSize(*dimensions))
         self._slider.setTarget_(NSApp)
         self._menuitem = NSMenuItem.alloc().init()
@@ -776,11 +776,11 @@ class SliderMenuItem(object):
     @property
     def value(self):
         """The current position of the slider."""
-        return self._slider.value()
+        return self._slider.doubleValue()
 
     @value.setter
     def value(self, new_value):
-        self._slider.setValue_(new_value)
+        self._slider.setDoubleValue_(new_value)
 
 
 class SeparatorMenuItem(object):
@@ -874,7 +874,7 @@ class Window(object):
         Providing a `cancel` string will set the button text rather than only using text "Cancel". `message` is no
         longer a required parameter.
 
-    .. versionchanged:: 0.2.3
+    .. versionchanged:: 0.3.0
         Add `secure` text input field functionality.
 
     :param message: the text positioned below the `title` in smaller font. If not a string, will use the string
@@ -1115,6 +1115,32 @@ class NSApp(NSObject):
         if not (self.nsstatusitem.title() or self.nsstatusitem.image()):
             self.nsstatusitem.setTitle_(self._app['_name'])
 
+    def applicationDidFinishLaunching_(self, notification):
+        workspace          = NSWorkspace.sharedWorkspace()
+        notificationCenter = workspace.notificationCenter()
+        notificationCenter.addObserver_selector_name_object_(
+            self,
+            self.receiveSleepNotification_,
+            NSWorkspaceWillSleepNotification,
+            None
+        )
+        notificationCenter.addObserver_selector_name_object_(
+            self,
+            self.receiveWakeNotification_,
+            NSWorkspaceDidWakeNotification,
+            None
+        )
+
+    def receiveSleepNotification_(self, notification):
+        _log("receiveSleepNotification")
+        app = getattr(App, '*app_instance')
+        return app.sleep()
+
+    def receiveWakeNotification_(self, notification):
+        _log("receiveWakeNotification")
+        app = getattr(App, '*app_instance')
+        return app.wake()
+
     @classmethod
     def callback_(cls, nsmenuitem):
         self, callback = cls._ns_to_py_and_callback[nsmenuitem]
@@ -1330,6 +1356,8 @@ class App(object):
 
         self._nsapp.initializeStatusBar()
         self.on_before_event_loop()
+
+        AppHelper.installMachInterrupt()
         AppHelper.runEventLoop()
 
     def on_before_event_loop(self):
