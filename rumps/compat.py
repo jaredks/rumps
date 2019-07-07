@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import sys
+try:
+    PY2 = True
+    text_type = unicode
+    string_types = basestring
 
-PY2 = sys.version_info[0] == 2
-
-if not PY2:
+    iteritems = lambda d: d.iteritems()
+except NameError:
+    PY2 = False
     text_type = str
     string_types = (str,)
 
     iteritems = lambda d: iter(d.items())
-
-else:
-    text_type = unicode
-    string_types = (str, unicode)
-
-    iteritems = lambda d: d.iteritems()
