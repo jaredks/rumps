@@ -1065,7 +1065,7 @@ class NSApp(NSObject):
         notification_center.removeDeliveredNotification_(notification)
         ns_dict = notification.userInfo()
         if ns_dict is None:
-            data = None
+            data = {}
         else:
             dumped = ns_dict['value']
             app = getattr(App, '*app_instance')
@@ -1080,6 +1080,7 @@ class NSApp(NSObject):
             try:
                 data['activationType'] = notification.activationType()
                 data['actualDeliveryDate'] = notification.actualDeliveryDate()
+                data['response'] = notification.response()
                 _call_as_function_or_method(notification_function, data)
             except Exception:
                 _log(traceback.format_exc())
