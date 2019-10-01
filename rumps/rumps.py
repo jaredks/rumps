@@ -83,6 +83,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
         title, ok, cancel, other, message)
+    alert.addObserver_selector_name_object_(self, 'enableDarkMode','AppleInterfaceThemeChangedNotification', None)
     alert.setAlertStyle_(0)  # informational style
     if icon_path is not None:
         icon = _nsimage_from_file(icon_path)
