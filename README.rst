@@ -3,7 +3,7 @@ rumps
 
 **R**\ idiculously **U**\ ncomplicated **m**\ acOS **P**\ ython **S**\ tatusbar apps.
 
-.. image:: https://raw.github.com/jaredks/rumps/master/examples/rumps_example.png
+.. image:: examples/rumps_example.png
 
 .. code-block:: python
 
