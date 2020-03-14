@@ -468,6 +468,9 @@ Works Made With rumps
 `steemticker-osx - ZachC16
 <https://github.com/ZachC16/steemticker-osx/>`_
 
+`Timebox - visini
+<https://github.com/visini/timebox/>`_
+
 `Telkom-ADSL-Data-Usage - parautenbach
 <https://github.com/parautenbach/Telkom-ADSL-Data-Usage/>`_
 
