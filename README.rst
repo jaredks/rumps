@@ -136,7 +136,7 @@ Documentation is available at http://rumps.readthedocs.org
 License
 -------
 
-"Modified BSD License". See LICENSE for details. Copyright Jared Suttles, 2017.
+"Modified BSD License". See LICENSE for details. Copyright Jared Suttles, 2020.
 
 Works Made With rumps
 ---------------------
