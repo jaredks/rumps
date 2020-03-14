@@ -1,10 +1,9 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+
 # rumps: Ridiculously Uncomplicated macOS Python Statusbar apps.
-# Copyright: (c) 2017, Jared Suttles. All rights reserved.
+# Copyright: (c) 2020, Jared Suttles. All rights reserved.
 # License: BSD, see LICENSE for details.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 
 _NOTIFICATIONS = True
 
