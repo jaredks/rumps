@@ -56,6 +56,7 @@ setup(
     extras_require={
         'dev': [
             'pytest>=4.3',
+            'pytest-mock>=2.0.0',
             'tox>=3.8'
         ]
     },
