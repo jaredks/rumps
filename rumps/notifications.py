@@ -6,6 +6,7 @@ try:
 except ImportError:
     _ENABLED = False
 
+import datetime
 import os
 import sys
 import traceback
@@ -204,13 +205,43 @@ class Notification(compat.collections_abc.Mapping):
         return '<{0}: [data: {1}]>'.format(type(self).__name__, repr(self._data))
 
     @property
+    def title(self):
+        return compat.text_type(self._ns.title())
+
+    @property
+    def subtitle(self):
+        return compat.text_type(self._ns.subtitle())
+
+    @property
+    def message(self):
+        return compat.text_type(self._ns.informativeText())
+
+    @property
     def activation_type(self):
-        activationType = self._ns.activationType()
-        return activationType
+        activation_type = self._ns.activationType()
+        if activation_type == 1:
+            return 'contents_clicked'
+        elif activation_type == 2:
+            return 'action_button_clicked'
+        elif activation_type == 3:
+            return 'replied'
+        elif activation_type == 4:
+            return 'additional_action_clicked'
 
     @property
     def delivered_at(self):
-        return self._ns.actualDeliveryDate()
+        ns_date = self._ns.actualDeliveryDate()
+        seconds = ns_date.timeIntervalSince1970()
+        dt = datetime.datetime.fromtimestamp(seconds)
+        return dt
+
+    @property
+    def response(self):
+        ns_attributed_string = self._ns.response()
+        if ns_attributed_string is None:
+            return None
+        ns_string = ns_attributed_string.string()
+        return compat.text_type(ns_string)
 
     @property
     def data(self):
