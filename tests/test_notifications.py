@@ -5,10 +5,11 @@ import pytest
 import rumps
 
 # do this hacky thing
-notify = rumps._notifications.notify
-_clicked = rumps._notifications._clicked
-on_notification = rumps._notifications.on_notification
-Notification = rumps._notifications.Notification
+notifications = rumps._notifications
+notify = notifications.notify
+_clicked = notifications._clicked
+on_notification = notifications.on_notification
+Notification = notifications.Notification
 
 
 class NSUserNotificationCenterMock:
@@ -82,9 +83,33 @@ class TestNotification:
         assert n[2] == 22
         assert 3 in n
         assert len(n) == 2
+        assert list(n) == [2, 3]
 
     def test_raises_typeerror_when_no_mapping(self):
         n = Notification(None, [4, 55, 666])
         with pytest.raises(TypeError) as excinfo:
             n[2]
         assert 'cannot be used as a mapping' in str(excinfo.value)
+
+
+class TestDefaultUserNotificationCenter:
+    def test_basic(self):
+        """Ensure we can obtain a PyObjC default notification center object."""
+        ns_user_notification_center = notifications._default_user_notification_center()
+        assert type(ns_user_notification_center).__name__ == '_NSConcreteUserNotificationCenter'
+
+
+class TestInitNSApp:
+    def test_calls(self, mocker):
+        """Is the method called as expected?"""
+        path = 'rumps._notifications._default_user_notification_center'
+        mock_func = mocker.patch(path)
+        ns_app_fake = object()
+        notifications._init_nsapp(ns_app_fake)
+        mock_func().setDelegate_.assert_called_once_with(ns_app_fake)
+
+    def test_exists(self):
+        """Does the method exist in the framework?"""
+        ns_user_notification_center = notifications._default_user_notification_center()
+        ns_app_fake = object()
+        ns_user_notification_center.setDelegate_(ns_app_fake)
