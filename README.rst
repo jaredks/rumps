@@ -549,5 +549,8 @@ Works Made With rumps
 `Zero - beejhuff
 <https://github.com/beejhuff/Zero/>`_
 
+`ShortyURLShortener - Naktrem
+<https://github.com/Naktrem/ShortyURLShortener/>`_
+
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
