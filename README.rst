@@ -437,6 +437,9 @@ Works Made With rumps
 
 `sharfoo - furqan-shakoor
 <https://github.com/furqan-shakoor/sharfoo/>`_
+ 
+`ShortyURLShortener - Naktrem
+<https://github.com/Naktrem/ShortyURLShortener/>`_
 
 `shotput - amussey
 <https://github.com/amussey/shotput/>`_
