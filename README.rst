@@ -276,6 +276,9 @@ Works Made With rumps
 `hs100-status-bar - craig-davis
 <https://github.com/craig-davis/hs100-status-bar/>`_
 
+`iBatteryStats - saket13
+<https://github.com/saket13/iBatteryStats/>`_
+
 `iBrew - Tristan79
 <https://github.com/Tristan79/iBrew/>`_
 
