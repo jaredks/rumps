@@ -495,6 +495,9 @@ Works Made With rumps
 `tracker - jtxx000
 <https://github.com/jtxx000/tracker/>`_
 
+`TrojanA - chrisxiao
+<https://github.com/chrisxiao/TrojanA/>`_
+
 `umma - mankoff
 <https://github.com/mankoff/umma/>`_
 
