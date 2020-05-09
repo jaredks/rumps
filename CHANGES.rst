@@ -4,6 +4,7 @@ Changes
 0.3.0.dev
 ---------
 
+- Notifications: fixes, cleanup, and tests #131
 - Fix slider for some older macOS versions (10.11 and before?)
 - Keyboard interrupts now stop a running application
 
