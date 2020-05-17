@@ -75,6 +75,7 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
         title, ok, cancel, other, message)
+    alert.window().setAppearance_(AppKit.NSAppearance.currentAppearance())
     alert.setAlertStyle_(0)  # informational style
     if icon_path is not None:
         icon = _nsimage_from_file(icon_path)
@@ -846,6 +847,7 @@ class Window(object):
         :return: a :class:`rumps.rumps.Response` object that contains the text and the button clicked as an integer.
         """
         _log(self)
+        self._alert.window().setAppearance_(AppKit.NSAppearance.currentAppearance())
         clicked = self._alert.runModal() % 999
         if clicked > 2 and self._cancel:
             clicked -= 1
