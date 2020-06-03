@@ -24,6 +24,7 @@ from .utils import ListDict
 from .compat import text_type, string_types, iteritems, collections_abc
 
 from . import _internal
+from . import events
 from . import notifications
 
 _TIMERS = weakref.WeakKeyDictionary()
@@ -948,15 +949,17 @@ class NSApp(NSObject):
             None
         )
 
-    def receiveSleepNotification_(self, notification):
-        _log("receiveSleepNotification")
-        app = getattr(App, '*app_instance')
-        return app.sleep()
+    def receiveSleepNotification_(self, ns_notification):
+        _log('receiveSleepNotification')
+        events.on_sleep.emit()
 
-    def receiveWakeNotification_(self, notification):
-        _log("receiveWakeNotification")
-        app = getattr(App, '*app_instance')
-        return app.wake()
+    def receiveWakeNotification_(self, ns_notification):
+        _log('receiveWakeNotification')
+        events.on_wake.emit()
+
+    def applicationWillTerminate_(self, ns_notification):
+        _log('applicationWillTerminate')
+        events.before_quit.emit()
 
     @classmethod
     def callback_(cls, nsmenuitem):
@@ -1166,4 +1169,5 @@ class App(object):
         self._nsapp.initializeStatusBar()
 
         AppHelper.installMachInterrupt()
+        events.before_start.emit()
         AppHelper.runEventLoop()

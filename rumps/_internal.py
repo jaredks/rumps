@@ -27,7 +27,7 @@ def require_string_or_none(*objs):
             )
 
 
-def call_as_function_or_method(func, event):
+def call_as_function_or_method(func, *args, **kwargs):
     # The idea here is that when using decorators in a class, the functions passed are not bound so we have to
     # determine later if the functions we have (those saved as callbacks) for particular events need to be passed
     # 'self'.
@@ -42,8 +42,8 @@ def call_as_function_or_method(func, event):
     else:
         for name, method in inspect.getmembers(app, predicate=inspect.ismethod):
             if method.__func__ is func:
-                return method(event)
-    return func(event)
+                return method(*args, **kwargs)
+    return func(*args, **kwargs)
 
 
 def guard_unexpected_errors(func):
