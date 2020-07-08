@@ -4,7 +4,7 @@ rumps.debug_mode(True)
 
 @rumps.clicked('Icon', 'On')
 def a(_):
-    app.icon = 'test.png'
+    app.icon = 'pony.jpg'
 
 @rumps.clicked('Icon', 'Off')
 def b(_):
