@@ -198,6 +198,9 @@ Works Made With rumps
 `camsketch - pdubroy
 <https://github.com/pdubroy/camsketch/>`_
 
+`casita - david-kuehn
+<https://github.com/david-kuehn/casita/>`_
+
 `ComicStreamer - beville
 <https://github.com/beville/ComicStreamer/>`_
 
