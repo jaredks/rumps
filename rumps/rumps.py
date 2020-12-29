@@ -20,8 +20,9 @@ import pickle
 import traceback
 import weakref
 
-from .utils import ListDict
 from .compat import text_type, string_types, iteritems, collections_abc
+from .text_field import Editing, SecureEditing
+from .utils import ListDict
 
 from . import _internal
 from . import notifications
@@ -746,9 +747,9 @@ class Window(object):
         self._alert.setAlertStyle_(0)  # informational style
 
         if secure:
-            self._textfield = NSSecureTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+            self._textfield = SecureEditing.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
         else:
-            self._textfield = NSTextField.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
+            self._textfield = Editing.alloc().initWithFrame_(NSMakeRect(0, 0, *dimensions))
         self._textfield.setSelectable_(True)
         self._alert.setAccessoryView_(self._textfield)
 
