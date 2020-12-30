@@ -1167,3 +1167,17 @@ class App(object):
 
         AppHelper.installMachInterrupt()
         AppHelper.runEventLoop()
+
+    def sleep(self):
+        """Method being run when system is going to sleep
+
+        To be overridden in your app
+        """
+        pass
+
+    def wake(self):
+        """Method being run when system awakes from sleep
+
+        To be overridden in your app
+        """
+        pass
