@@ -920,6 +920,9 @@ class NSApp(NSObject):
                  'should have a callback of quit_application or call it indirectly.')
         self.nsstatusitem.setMenu_(mainmenu._menu)  # mainmenu of our status bar spot (_menu attribute is NSMenu)
 
+    def showMenu(self):
+        self.nsstatusitem.button().performClick_(None)
+
     def setStatusBarTitle(self):
         self.nsstatusitem.setTitle_(self._app['_title'])
         self.fallbackOnName()
@@ -1104,6 +1107,11 @@ class App(object):
             self._quit_button = None
         else:
             self._quit_button = MenuItem(quit_text)
+
+    # Show status item
+    #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def showMenu(self):
+        self._nsapp.showMenu()
 
     # Open files in application support folder
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
