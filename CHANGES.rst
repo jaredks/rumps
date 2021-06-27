@@ -4,6 +4,7 @@ Changes
 0.3.0.dev
 ---------
 
+- Allow menu items to be hidden #138
 - Fix dark mode alert style #137
 - Notifications: fixes, cleanup, and tests #131
 - Fix slider for some older macOS versions (10.11 and before?)
