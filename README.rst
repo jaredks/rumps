@@ -531,6 +531,9 @@ Works Made With rumps
 `votingpowerbar - therealwolf42
 <https://github.com/therealwolf42/votingpowerbar/>`_
 
+`WakeTime App - dleicht
+<https://github.com/dleicht/waketime/>`_
+
 `WallpDesk - L3rchal
 <https://github.com/L3rchal/WallpDesk/>`_
 
