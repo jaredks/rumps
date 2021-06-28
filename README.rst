@@ -477,6 +477,9 @@ Works Made With rumps
 `steemticker-osx - ZachC16
 <https://github.com/ZachC16/steemticker-osx/>`_
 
+`Timebar - devonkong
+<https://github.com/devonkong/timebar>`_
+
 `Timebox - visini
 <https://github.com/visini/timebox/>`_
 
