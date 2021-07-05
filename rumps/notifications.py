@@ -15,6 +15,7 @@ import Foundation
 
 from . import _internal
 from . import compat
+from . import events
 
 
 def on_notification(f):
@@ -32,8 +33,7 @@ def on_notification(f):
                 print 'i know this'
 
     """
-    on_notification.__dict__['*'] = f
-    return f
+    return events.on_notification.register(f)
 
 
 def _gather_info_issue_9():  # pragma: no cover
@@ -116,20 +116,15 @@ def _clicked(ns_user_notification_center, ns_user_notification):
             traceback.print_exc()
             return
 
-    try:
-        notification_handler = getattr(on_notification, '*')
-    except AttributeError:
-        # notification center function not specified, no error but log warning
+    # notification center function not specified => no error but log warning
+    if not events.on_notification.callbacks:
         rumps._log(
             'WARNING: notification received but no function specified for '
             'answering it; use @notifications decorator to register a function.'
         )
     else:
         notification = Notification(ns_user_notification, data)
-        try:
-            _internal.call_as_function_or_method(notification_handler, notification)
-        except Exception:
-            traceback.print_exc()
+        events.on_notification.emit(notification)
 
 
 def notify(title, subtitle, message, data=None, sound=True,

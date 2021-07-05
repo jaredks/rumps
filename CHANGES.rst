@@ -4,6 +4,7 @@ Changes
 0.3.0.dev
 ---------
 
+- Add event hooks, enable multiple event handlers #140
 - Allow menu items to be hidden #138
 - Fix dark mode alert style #137
 - Notifications: fixes, cleanup, and tests #131
