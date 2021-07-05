@@ -1,8 +1,8 @@
 Changes
 =======
 
-0.3.0.dev
----------
+0.4.0 (2021-07-05)
+------------------
 
 - Add event hooks, enable multiple event handlers #140
 - Allow menu items to be hidden #138

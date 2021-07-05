@@ -531,7 +531,11 @@ class MenuItem(Menu):
 
     @property
     def hidden(self):
-        """Indicates whether the menu item is hidden."""
+        """Indicates whether the menu item is hidden.
+
+        .. versionadded:: 0.4.0
+
+        """
         return self._menuitem.isHidden()
 
     @hidden.setter
@@ -539,11 +543,19 @@ class MenuItem(Menu):
         self._menuitem.setHidden_(value)
 
     def hide(self):
-        """Hide the menu item."""
+        """Hide the menu item.
+
+        .. versionadded:: 0.4.0
+
+        """
         self.hidden = True
 
     def show(self):
-        """Show the menu item."""
+        """Show the menu item.
+
+        .. versionadded:: 0.4.0
+
+        """
         self.hidden = False
 
     def set_callback(self, callback, key=None):
