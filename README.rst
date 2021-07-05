@@ -198,6 +198,9 @@ Works Made With rumps
 `camsketch - pdubroy
 <https://github.com/pdubroy/camsketch/>`_
 
+`casita - david-kuehn
+<https://github.com/david-kuehn/casita/>`_
+
 `ComicStreamer - beville
 <https://github.com/beville/ComicStreamer/>`_
 
@@ -474,6 +477,9 @@ Works Made With rumps
 `steemticker-osx - ZachC16
 <https://github.com/ZachC16/steemticker-osx/>`_
 
+`Timebar - devonkong
+<https://github.com/devonkong/timebar>`_
+
 `Timebox - visini
 <https://github.com/visini/timebox/>`_
 
@@ -527,6 +533,9 @@ Works Made With rumps
 
 `votingpowerbar - therealwolf42
 <https://github.com/therealwolf42/votingpowerbar/>`_
+
+`WakeTime App - dleicht
+<https://github.com/dleicht/waketime/>`_
 
 `WallpDesk - L3rchal
 <https://github.com/L3rchal/WallpDesk/>`_

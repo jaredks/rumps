@@ -529,6 +529,23 @@ class MenuItem(Menu):
     def state(self, new_state):
         self._menuitem.setState_(new_state)
 
+    @property
+    def hidden(self):
+        """Indicates whether the menu item is hidden."""
+        return self._menuitem.isHidden()
+
+    @hidden.setter
+    def hidden(self, value):
+        self._menuitem.setHidden_(value)
+
+    def hide(self):
+        """Hide the menu item."""
+        self.hidden = True
+
+    def show(self):
+        """Show the menu item."""
+        self.hidden = False
+
     def set_callback(self, callback, key=None):
         """Set the function serving as callback for when a click event occurs on this menu item. When `callback` is
         ``None``, it will disable the callback function and grey out the menu item. If `key` is a string, set as the
