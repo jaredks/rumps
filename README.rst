@@ -459,6 +459,9 @@ Works Made With rumps
 `slackify - nikodraca
 <https://github.com/nikodraca/slackify/>`_
 
+`Snapgrid - VladUsatii
+<https://github.com/VladUsatii/snapgrid/>`_
+
 `snippets - quillford
 <https://github.com/quillford/snippets/>`_
 
