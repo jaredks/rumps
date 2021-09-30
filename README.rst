@@ -369,6 +369,9 @@ Works Made With rumps
 `obmenka - vlakin
 <https://github.com/vlakin/obmenka/>`_
 
+`OnAir - henrik242
+<https://github.com/henrik242/OnAir/>`_
+
 `org-clock-dashboard - srid
 <https://github.com/srid/org-clock-dashboard/>`_
 
