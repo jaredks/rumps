@@ -207,6 +207,9 @@ Works Made With rumps
 `commitwatch - chrisfosterelli
 <https://github.com/chrisfosterelli/commitwatch/>`_
 
+`ComMute - cwverhey
+<https://github.com/cwverhey/ComMute/>`_
+
 `computer-time - rbrich
 <https://github.com/rbrich/computer-time/>`_
 
