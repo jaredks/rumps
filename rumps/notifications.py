@@ -129,7 +129,7 @@ def _clicked(ns_user_notification_center, ns_user_notification):
 
 def notify(title, subtitle, message, data=None, sound=True,
            action_button=None, other_button=None, has_reply_button=False,
-           icon=None):
+           icon=None, ignoreDnD=False):
     """Send a notification to Notification Center (OS X 10.8+). If running on a
     version of macOS that does not support notifications, a ``RuntimeError``
     will be raised. Apple says,
@@ -151,6 +151,8 @@ def notify(title, subtitle, message, data=None, sound=True,
     :param has_reply_button: whether or not the notification has a reply button.
     :param icon: the filename of an image for the notification's icon, will
                  replace the default.
+    :param ignoreDnD: whether the notification should ignore do not disturb,
+                 e.g., appear also while screen sharing.
     """
     from . import rumps
 
@@ -185,6 +187,8 @@ def notify(title, subtitle, message, data=None, sound=True,
         notification.set_showsButtons_(True)
     if has_reply_button:
         notification.setHasReplyButton_(True)
+    if ignoreDnD:
+        notification.set_ignoresDoNotDisturb_(True)
 
     notification.setDeliveryDate_(Foundation.NSDate.dateWithTimeInterval_sinceDate_(0, Foundation.NSDate.date()))
     notification_center = _default_user_notification_center()
