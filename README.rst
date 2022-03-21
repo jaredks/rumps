@@ -342,6 +342,9 @@ Works Made With rumps
 `MenuBarGmail - rcmdnk
 <https://github.com/rcmdnk/MenuBarGmail/>`_
 
+`MenuPing - Julien Bordet
+<https://github.com/julienbordet/MenuPing/>`_
+
 `midi2dmx - davidbistolas
 <https://github.com/davidbistolas/midi2dmx/>`_
 
