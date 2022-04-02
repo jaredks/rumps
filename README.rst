@@ -534,6 +534,9 @@ Works Made With rumps
 `votingpowerbar - therealwolf42
 <https://github.com/therealwolf42/votingpowerbar/>`_
 
+`VPN Handler - tsarenkotxt
+<https://github.com/tsarenkotxt/vpn-handler/>`_
+
 `WakeTime App - dleicht
 <https://github.com/dleicht/waketime/>`_
 
