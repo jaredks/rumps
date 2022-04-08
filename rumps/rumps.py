@@ -421,7 +421,7 @@ class MenuItem(Menu):
     # NOTE:
     # Because of the quirks of PyObjC, a class level dictionary **inside an NSObject subclass for 10.9.x** is required
     # in order to have callback_ be a @classmethod. And we need callback_ to be class level because we can't use
-    # instances in setTarget_ method of NSMenuItem. Otherwise this would be much more straightfoward like Timer class.
+    # instances in setTarget_ method of NSMenuItem. Otherwise this would be much more straightforward like Timer class.
     #
     # So the target is always the NSApp class and action is always the @classmethod callback_ -- for every function
     # decorated with @clicked(...). All we do is lookup the MenuItem instance and the user-provided callback function
