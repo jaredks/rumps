@@ -584,3 +584,8 @@ Works Made With rumps
 
 Submit a pull request to add your own!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Contributing
+------------
+
+If you've submitted a pull request and need it reviewed, please request a review from [@daredoes](https://github.com/daredoes) (contributing in free time, so please be patient)
