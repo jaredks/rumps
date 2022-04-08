@@ -11,7 +11,7 @@ import Foundation
 import AppKit
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
-                        NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString)
+                        NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString, NSUserDefaults)
 from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification
 from PyObjCTools import AppHelper
 
@@ -76,7 +76,8 @@ def alert(title=None, message='', ok=None, cancel=None, other=None, icon_path=No
         cancel = 'Cancel' if cancel else None
     alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
         title, ok, cancel, other, message)
-    alert.window().setAppearance_(AppKit.NSAppearance.currentAppearance())
+    if NSUserDefaults.standardUserDefaults().stringForKey_('AppleInterfaceStyle') == 'Dark':
+        alert.window().setAppearance_(AppKit.NSAppearance.appearanceNamed_('NSAppearanceNameVibrantDark'))
     alert.setAlertStyle_(0)  # informational style
     if icon_path is not None:
         icon = _nsimage_from_file(icon_path)
@@ -877,7 +878,8 @@ class Window(object):
         :return: a :class:`rumps.rumps.Response` object that contains the text and the button clicked as an integer.
         """
         _log(self)
-        self._alert.window().setAppearance_(AppKit.NSAppearance.currentAppearance())
+        if NSUserDefaults.standardUserDefaults().stringForKey_('AppleInterfaceStyle') == 'Dark':
+            self._alert.window().setAppearance_(AppKit.NSAppearance.appearanceNamed_('NSAppearanceNameVibrantDark'))
         clicked = self._alert.runModal() % 999
         if clicked > 2 and self._cancel:
             clicked -= 1
