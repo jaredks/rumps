@@ -237,6 +237,9 @@ Works Made With rumps
 `duplicati - duplicati
 <https://github.com/duplicati/duplicati/>`_
 
+`dysonMacOS - fhenwood
+<https://github.com/fhenwood/dysonMacOS>`_
+
 `earth - nickrobson
 <https://github.com/nickrobson/earth/>`_
 
