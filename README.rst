@@ -195,6 +195,9 @@ Works Made With rumps
 `c1t1 - e9t
 <https://github.com/e9t/c1t1/>`_
 
+`CamAlert - MrBananaPants
+<https://github.com/MrBananaPants/CamAlert/>`_
+
 `camsketch - pdubroy
 <https://github.com/pdubroy/camsketch/>`_
 
