@@ -201,6 +201,9 @@ Works Made With rumps
 `casita - david-kuehn
 <https://github.com/david-kuehn/casita/>`_
 
+`ChargeMon - RhetTbull
+<https://github.com/RhetTbull/ChargeMon/>`_
+
 `ComicStreamer - beville
 <https://github.com/beville/ComicStreamer/>`_
 
@@ -503,6 +506,9 @@ Works Made With rumps
 
 `Telton - Yywww
 <https://github.com/Yywww/Telton/>`_
+
+`Textinator - RhetTbull
+<https://github.com/RhetTbull/textinator/>`_
 
 `these-days - hahayes
 <https://github.com/hahayes/these-days/>`_
