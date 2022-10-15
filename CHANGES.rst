@@ -1,9 +1,12 @@
 Changes
 =======
 
-0.4.0 (2021-07-05)
+0.4.0 (2022-10-14)
 ------------------
 
+- Automatically display windows in light or dark mode #162
+- Allow copy, paste, etc #150
+- Allow notifications to be displayed in DND #179
 - Add event hooks, enable multiple event handlers #140
 - Allow menu items to be hidden #138
 - Fix dark mode alert style #137
