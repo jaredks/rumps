@@ -260,6 +260,8 @@ class Menu(ListDict):
         if key not in self:
             key, value = self._process_new_menuitem(key, value)
             self._menu.addItem_(value._menuitem)
+            if isinstance(value, SliderMenuItem):
+                self._set_subview_dimensions(self, value)
             super(Menu, self).__setitem__(key, value)
 
     def __delitem__(self, key):
@@ -285,6 +287,17 @@ class Menu(ListDict):
     def fromkeys(cls, *args, **kwargs):
         raise NotImplementedError
 
+    def _set_subview_dimensions(self, menu, ele):
+            # Ensure the item view spans the full width of the menu
+            menu_width = max(menu._menu.size().width, 200)
+            view = ele._menuitem.view()
+            view_height = view.frame().size.height
+            view.setFrameSize_((menu_width, view_height))
+
+            # Give the subview (e.g. slider) 5% padding on each side
+            subview = view.subviews()[0]
+            subview.setFrame_(AppKit.NSMakeRect((menu_width - menu_width * 0.9) / 2, (view_height - view_height * 0.9) / 2, menu_width * 0.9, view_height * 0.9))
+
     def update(self, iterable, **kwargs):
         """Update with objects from `iterable` after each is converted to a :class:`rumps.MenuItem`, ignoring
         existing keys. This update is a bit different from the usual ``dict.update`` method. It works recursively and
@@ -304,22 +317,9 @@ class Menu(ListDict):
             - if the element is a mapping, each key-value pair will act as an iterable having a length of 2
 
         """
-        def set_subview_dimensions(menu, ele):
-            # Ensure the item view spans the full width of the menu
-            menu_width = max(menu._menu.size().width, 200)
-            view = ele._menuitem.view()
-            view_height = view.frame().size.height
-            view.setFrameSize_((menu_width, view_height))
-
-            # Give the subview (e.g. slider) 5% padding on each side
-            subview = view.subviews()[0]
-            subview.setFrame_(AppKit.NSMakeRect((menu_width - menu_width * 0.9) / 2, (view_height - view_height * 0.9) / 2, menu_width * 0.9, view_height * 0.9))
-
         def parse_menu(iterable, menu, depth):
             if isinstance(iterable, MenuItem):
                 menu.add(iterable)
-                if isinstance(iterable, SliderMenuItem):
-                    set_subview_dimensions(menu, iterable)
                 return
 
             for n, ele in enumerate(iteritems(iterable) if isinstance(iterable, collections_abc.Mapping) else iterable):
@@ -344,7 +344,7 @@ class Menu(ListDict):
                 else:
                     menu.add(ele)
                     if isinstance(ele, SliderMenuItem):
-                        set_subview_dimensions(menu, ele)
+                        self._set_subview_dimensions(menu, ele)
         parse_menu(iterable, self, 0)
         parse_menu(kwargs, self, 0)
 
@@ -377,6 +377,8 @@ class Menu(ListDict):
         existing_menuitem = self[existing_key]
         index = self._menu.indexOfItem_(existing_menuitem._menuitem)
         self._menu.insertItem_atIndex_(menuitem._menuitem, index + pos)
+        if isinstance(menuitem, SliderMenuItem):
+            self._set_subview_dimensions(self, menuitem)
 
     # Processing MenuItems
     #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
