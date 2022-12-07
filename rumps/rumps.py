@@ -12,7 +12,7 @@ import AppKit
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString, NSUserDefaults)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification, NSView
 from PyObjCTools import AppHelper
 
 import os
@@ -304,9 +304,22 @@ class Menu(ListDict):
             - if the element is a mapping, each key-value pair will act as an iterable having a length of 2
 
         """
+        def set_subview_dimensions(menu, ele):
+            # Ensure the item view spans the full width of the menu
+            menu_width = max(menu._menu.size().width, 200)
+            view = ele._menuitem.view()
+            view_height = view.frame().size.height
+            view.setFrameSize_((menu_width, view_height))
+
+            # Give the subview (e.g. slider) 5% padding on each side
+            subview = view.subviews()[0]
+            subview.setFrame_(AppKit.NSMakeRect((menu_width - menu_width * 0.9) / 2, (view_height - view_height * 0.9) / 2, menu_width * 0.9, view_height * 0.9))
+
         def parse_menu(iterable, menu, depth):
             if isinstance(iterable, MenuItem):
                 menu.add(iterable)
+                if isinstance(iterable, SliderMenuItem):
+                    set_subview_dimensions(menu, iterable)
                 return
 
             for n, ele in enumerate(iteritems(iterable) if isinstance(iterable, collections_abc.Mapping) else iterable):
@@ -330,6 +343,8 @@ class Menu(ListDict):
                 # menu item / could be visual separator where ele is None or separator
                 else:
                     menu.add(ele)
+                    if isinstance(ele, SliderMenuItem):
+                        set_subview_dimensions(menu, ele)
         parse_menu(iterable, self, 0)
         parse_menu(kwargs, self, 0)
 
@@ -611,6 +626,7 @@ class SliderMenuItem(object):
     """
 
     def __init__(self, value=50, min_value=0, max_value=100, callback=None, dimensions=(180, 15)):
+        self._view = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, 0, 30))
         self._slider = NSSlider.alloc().init()
         self._slider.setMinValue_(min_value)
         self._slider.setMaxValue_(max_value)
@@ -619,7 +635,8 @@ class SliderMenuItem(object):
         self._slider.setTarget_(NSApp)
         self._menuitem = NSMenuItem.alloc().init()
         self._menuitem.setTarget_(NSApp)
-        self._menuitem.setView_(self._slider)
+        self._view.addSubview_(self._slider)
+        self._menuitem.setView_(self._view)
         self.set_callback(callback)
 
     def __repr__(self):
