@@ -12,7 +12,7 @@ import AppKit
 
 from Foundation import (NSDate, NSTimer, NSRunLoop, NSDefaultRunLoopMode, NSSearchPathForDirectoriesInDomains,
                         NSMakeRect, NSLog, NSObject, NSMutableDictionary, NSString, NSUserDefaults)
-from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification, NSView
+from AppKit import NSApplication, NSStatusBar, NSMenu, NSMenuItem, NSAlert, NSTextField, NSSecureTextField, NSImage, NSSlider, NSSize, NSWorkspace, NSWorkspaceWillSleepNotification, NSWorkspaceDidWakeNotification, NSView, NSSegmentedControl, NSSegmentSwitchTrackingSelectOne, NSSegmentSwitchTrackingSelectAny, NSSegmentSwitchTrackingMomentary, NSSegmentStyleRoundRect, NSSegmentStyleSmallSquare, NSSegmentStyleSeparated
 from PyObjCTools import AppHelper
 
 import os
@@ -236,6 +236,47 @@ def slider(*args, **options):
         return f
     return decorator
 
+def segmented(*args, **options):
+    """Decorator for registering a function as a callback for a button click action on a :class:`rumps.SegmentedMenuItem` within
+    the application. All elements of the provided path will be created as :class:`rumps.MenuItem` objects. The
+    :class:`rumps.SegmentedMenuItem` will be created as a child of the last menu item.
+
+    Accepts the same keyword arguments as :class:`rumps.SegmentedMenuItem`.
+
+    .. versionadded:: 0.5.0
+
+    :param args: a series of strings representing the path to a :class:`rumps.SegmentedMenuItem` in the main menu of the
+                 application.
+    """
+    def decorator(f):
+
+        def register_click(self):
+
+            # self not defined yet but will be later in 'run' method
+            menuitem = self._menu
+            if menuitem is None:
+                raise ValueError('no menu created')
+
+            # create here in case of error so we don't create the path
+            segmented_menu_item = SegmentedMenuItem(**options)
+            segmented_menu_item.set_callback(f)
+
+            for arg in args:
+                try:
+                    menuitem = menuitem[arg]
+                except KeyError:
+                    menuitem.add(arg)
+                    menuitem = menuitem[arg]
+
+            menuitem.add(segmented_menu_item)
+
+        # delay registering the button until we have a current instance to be able to traverse the menu
+        buttons = clicked.__dict__.setdefault('*buttons', [])
+        buttons.append(register_click)
+
+        return f
+    return decorator
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -260,7 +301,8 @@ class Menu(ListDict):
         if key not in self:
             key, value = self._process_new_menuitem(key, value)
             self._menu.addItem_(value._menuitem)
-            if isinstance(value, SliderMenuItem):
+
+            if isinstance(value, SliderMenuItem) or isinstance(value, SegmentedMenuItem):
                 self._set_subview_dimensions(self, value)
             super(Menu, self).__setitem__(key, value)
 
@@ -288,15 +330,15 @@ class Menu(ListDict):
         raise NotImplementedError
 
     def _set_subview_dimensions(self, menu, ele):
-            # Ensure the item view spans the full width of the menu
-            menu_width = max(menu._menu.size().width, 200)
-            view = ele._menuitem.view()
-            view_height = view.frame().size.height
-            view.setFrameSize_((menu_width, view_height))
+        # Ensure the item view spans the full width of the menu
+        menu_width = max(menu._menu.size().width, 200)
+        view = ele._menuitem.view()
+        view_height = view.frame().size.height
+        view.setFrameSize_((menu_width, view_height))
 
-            # Give the subview (e.g. slider) 5% padding on each side
-            subview = view.subviews()[0]
-            subview.setFrame_(AppKit.NSMakeRect((menu_width - menu_width * 0.9) / 2, (view_height - view_height * 0.9) / 2, menu_width * 0.9, view_height * 0.9))
+        # Give the subview (e.g. slider) 5% padding on each side
+        subview = view.subviews()[0]
+        subview.setFrame_(AppKit.NSMakeRect((menu_width - menu_width * 0.9) / 2, (view_height - view_height * 0.9) / 2, menu_width * 0.9, view_height * 0.9))
 
     def update(self, iterable, **kwargs):
         """Update with objects from `iterable` after each is converted to a :class:`rumps.MenuItem`, ignoring
@@ -317,6 +359,7 @@ class Menu(ListDict):
             - if the element is a mapping, each key-value pair will act as an iterable having a length of 2
 
         """
+
         def parse_menu(iterable, menu, depth):
             if isinstance(iterable, MenuItem):
                 menu.add(iterable)
@@ -343,7 +386,7 @@ class Menu(ListDict):
                 # menu item / could be visual separator where ele is None or separator
                 else:
                     menu.add(ele)
-                    if isinstance(ele, SliderMenuItem):
+                    if isinstance(ele, SliderMenuItem) or isinstance(ele, SegmentedMenuItem):
                         self._set_subview_dimensions(menu, ele)
         parse_menu(iterable, self, 0)
         parse_menu(kwargs, self, 0)
@@ -377,7 +420,8 @@ class Menu(ListDict):
         existing_menuitem = self[existing_key]
         index = self._menu.indexOfItem_(existing_menuitem._menuitem)
         self._menu.insertItem_atIndex_(menuitem._menuitem, index + pos)
-        if isinstance(menuitem, SliderMenuItem):
+
+        if isinstance(menuitem, SliderMenuItem) or isinstance(menuitem, SegmentedMenuItem):
             self._set_subview_dimensions(self, menuitem)
 
     # Processing MenuItems
@@ -668,6 +712,94 @@ class SliderMenuItem(object):
     @value.setter
     def value(self, new_value):
         self._slider.setDoubleValue_(new_value)
+
+
+class SegmentedMenuItem(object):
+    """Represents a slider menu item within the application's menu.
+
+    .. versionadded:: 0.5.0
+
+    :param segments: list of strings to use as segment labels
+    :param multiselect: boolean value indicating whether multiple segments can be selected at once
+    :param momentary: boolean value indicating whether segments should stay active only while actively pressed (always True if only one segment is specified)
+    :param style: string controlling the appearance of the segmented control, either 'default', 'bordered', 'rectangular', or 'separated'
+    """
+
+    def __init__(self, segments, multiselect=False, momentary=False, style='default', callback=None):
+        self.__segments = segments
+        self.__state = [False for _ in segments]
+        self.__multiselect = multiselect
+
+        # Controls how button activation/deactivation is handled
+        if momentary or len(segments) == 1:
+            tracking_mode = NSSegmentSwitchTrackingMomentary
+        elif multiselect:
+            tracking_mode = NSSegmentSwitchTrackingSelectAny
+        else:
+            tracking_mode = NSSegmentSwitchTrackingSelectOne
+
+        # Create the segmented controller view
+        self._view = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, 200, 30))
+        self._control = NSSegmentedControl.segmentedControlWithLabels_trackingMode_target_action_(segments, tracking_mode, NSApp, None)
+        self._view.addSubview_(self._control)
+
+        # Controls the style of the controller
+        if style == 'bordered':
+            self._control.setSegmentStyle_(NSSegmentStyleRoundRect)
+        elif style == 'rectangular':
+            self._control.setSegmentStyle_(NSSegmentStyleSmallSquare)
+        elif style == 'separated':
+            self._control.setSegmentStyle_(NSSegmentStyleSeparated)
+
+        self._menuitem = NSMenuItem.alloc().init()
+        self._menuitem.setTarget_(NSApp)
+        self._menuitem.setView_(self._view)
+        self.set_callback(callback)
+
+    def __repr__(self):
+        return '<{0}: [selection: {1}; callback: {2}]>'.format(
+            type(self).__name__,
+            self.selection,
+            repr(self.callback)
+        )
+
+    def set_callback(self, callback):
+        """Set the function serving as callback for when a slide event occurs on this menu item.
+
+        :param callback: the function to be called when the user drags the marker on the slider.
+        """
+        def wrapped_callback(s):
+            index = self._control.selectedSegment()
+            if not self.__multiselect:
+                self.__state = [False for _ in self.__state]
+            self.__state[index] = not self.__state[index]
+            if callable(callback):
+                callback(s)
+
+        NSApp._ns_to_py_and_callback[self._control] = self, wrapped_callback
+        self._control.setAction_('callback:')
+
+    @property
+    def callback(self):
+        return NSApp._ns_to_py_and_callback[self._control][1]
+
+    @property
+    def selection(self):
+        """The currently selected segments."""
+        return [segment for index, segment in enumerate(self.__segments) if self.__state[index] is True]
+
+    @selection.setter
+    def selection(self, new_selection):
+        # Clear current selection
+        self._control.setSelectedSegment_(-1)
+        self.__state = [False for _ in self.__state]
+
+        # Select segments if they appear in the new_selection list
+        for new_segment in new_selection:
+            for index, segment in enumerate(self.__segments):
+                if new_segment == segment:
+                    self._control.setSelected_forSegment_(True, index)
+                    self.__state[index] = True
 
 
 class SeparatorMenuItem(object):
