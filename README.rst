@@ -492,6 +492,9 @@ Works Made With rumps
 `SpaceSwitcher - SankaitLaroiya
 <https://github.com/SankaitLaroiya/SpaceSwitcher/>`_
 
+`Speck - misternate
+<https://github.com/misternate/speck/>`_
+
 `SpotifyLyrics - yask123
 <https://github.com/yask123/SpotifyLyrics/>`_
 
