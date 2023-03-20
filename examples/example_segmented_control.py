@@ -1,8 +1,8 @@
 import rumps
 
 @rumps.segmented(segments=["10"])
-def button_press(self, sender):
-    print(self, sender)
+def button_press(sender):
+    print(sender)
 
 app = rumps.App('Segments', quit_button=rumps.MenuItem('Quit', key='q'))
 app.menu = [
