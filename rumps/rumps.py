@@ -768,16 +768,16 @@ class SegmentedMenuItem(object):
 
         :param callback: the function to be called when the user drags the marker on the slider.
         """
-        def wrapped_callback(s):
+        def wrapped_callback(sender):
             index = self._control.selectedSegment()
             if not self.__multiselect:
                 self.__state = [False for _ in self.__state]
             self.__state[index] = not self.__state[index]
             if callable(callback):
-                callback(s)
+                _internal.call_as_function_or_method(callback, sender)
 
         NSApp._ns_to_py_and_callback[self._control] = self, wrapped_callback
-        self._control.setAction_('callback:')
+        self._control.setAction_('callback:' if callback is not None else None)
 
     @property
     def callback(self):

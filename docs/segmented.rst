@@ -1,0 +1,4 @@
+segmented
+=========
+
+.. autofunction:: rumps.segmented
