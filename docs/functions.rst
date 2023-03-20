@@ -6,6 +6,8 @@ rumps Functions
 
    notifications
    clicked
+   segmented
+   slider
    timerfunc
    timers
    application_support

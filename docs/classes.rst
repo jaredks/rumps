@@ -8,4 +8,7 @@ rumps Classes
    MenuItem
    Window
    Response
+   SegmentedMenuItem
+   SeparatorMenuItem
+   SliderMenuItem
    Timer

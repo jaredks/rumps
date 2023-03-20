@@ -1,0 +1,4 @@
+slider
+======
+
+.. autofunction:: rumps.slider
