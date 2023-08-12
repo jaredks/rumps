@@ -501,6 +501,9 @@ Works Made With rumps
 `steemticker-osx - ZachC16
 <https://github.com/ZachC16/steemticker-osx/>`_
 
+`Tide-Bar - luisbaez13
+<https://github.com/luisbaez13/tide-bar>`_
+
 `Timebar - devonkong
 <https://github.com/devonkong/timebar>`_
 
