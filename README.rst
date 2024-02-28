@@ -306,6 +306,9 @@ Works Made With rumps
 `istat - Lingdu0
 <https://github.com/Lingdu0/istat/>`_
 
+`kalimba (Colima Menu Bar) - dee-me-tree-or-love
+<https://github.com/dee-me-tree-or-love/kalimba>`_
+
 `keynote_snap - sasn0
 <https://github.com/sasn0/keynote_snap/>`_
 
