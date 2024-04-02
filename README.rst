@@ -498,6 +498,9 @@ Works Made With rumps
 `SpotifyLyrics - yask123
 <https://github.com/yask123/SpotifyLyrics/>`_
 
+`Statusbar Converter - mindaugasw
+<https://github.com/mindaugasw/statusbar-converter/>`_
+
 `steemticker-osx - ZachC16
 <https://github.com/ZachC16/steemticker-osx/>`_
 
