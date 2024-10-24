@@ -282,6 +282,9 @@ Works Made With rumps
 `hatarake - kfdm-archive
 <https://github.com/kfdm-archive/hatarake/>`_
 
+`hue-menu-bar - ltillmann
+<https://github.com/ltillmann/hue-menu-bar/>`_
+
 `HipStatus - jamfit
 <https://github.com/jamfit/HipStatus/>`_
 
