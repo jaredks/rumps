@@ -339,6 +339,9 @@ Works Made With rumps
 `majo-v - r4lv
 <https://github.com/r4lv/majo-v/>`_
 
+`MacMenu-qBittorrent - Jumitti
+<https://github.com/Jumitti/MacMenu-qBittorrent/>`_
+
 `MBatteryApp - Elliot-Potts
 <https://github.com/Elliot-Potts/MBatteryApp/>`_
 
