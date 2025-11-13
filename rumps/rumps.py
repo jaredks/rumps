@@ -236,6 +236,49 @@ def slider(*args, **options):
         return f
     return decorator
 
+
+
+def text_field(*args, **options):
+    """Decorator for registering a function as a callback for text input on a :class:`rumps.TextFieldMenuItem` within
+    the application. All elements of the provided path will be created as :class:`rumps.MenuItem` objects. The
+    :class:`rumps.TextFieldMenuItem` will be created as a child of the last menu item.
+
+    Accepts the same keyword arguments as :class:`rumps.TextFieldMenuItem`.
+
+    .. versionadded:: 0.4.1
+
+    :param args: a series of strings representing the path to a :class:`rumps.TextFieldMenuItem` in the main menu of the
+                 application.
+    """
+    def decorator(f):
+
+        def register_text_field(self):
+
+            # self not defined yet but will be later in 'run' method
+            menuitem = self._menu
+            if menuitem is None:
+                raise ValueError('no menu created')
+
+            # create here in case of error so we don't create the path
+            text_field_menu_item = TextFieldMenuItem(**options)
+            text_field_menu_item.set_callback(f)
+
+            for arg in args:
+                try:
+                    menuitem = menuitem[arg]
+                except KeyError:
+                    menuitem.add(arg)
+                    menuitem = menuitem[arg]
+
+            menuitem.add(text_field_menu_item)
+
+        # delay registering the text field until we have a current instance to be able to traverse the menu
+        buttons = clicked.__dict__.setdefault('*buttons', [])
+        buttons.append(register_text_field)
+
+        return f
+    return decorator
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -668,6 +711,83 @@ class SliderMenuItem(object):
     @value.setter
     def value(self, new_value):
         self._slider.setDoubleValue_(new_value)
+
+
+class TextFieldMenuItem(object):
+    """Represents an editable text field menu item within the application's menu.
+
+    .. versionadded:: 0.4.1
+
+    :param value: a string for the initial text value of the field.
+    :param placeholder: a string shown as placeholder text when the field is empty.
+    :param callback: the function serving as callback for when text changes or user presses Enter in this menu item.
+    :param dimensions: a sequence of numbers whose length is two, specifying the dimensions of the text field.
+    :param margins: a sequence of numbers whose length is four (left, top, right, bottom) specifying the margins around the text field.
+    """
+    def __init__(self, value='', placeholder='', callback=None, dimensions=(200, 24), margins=(15, 5, 15, 5)):
+        # Calculate total view size including margins
+        left_margin, top_margin, right_margin, bottom_margin = margins
+        view_width = dimensions[0] + left_margin + right_margin
+        view_height = dimensions[1] + top_margin + bottom_margin
+        
+        # Create the container view with proper dimensions
+        self._view = NSView.alloc().initWithFrame_(NSMakeRect(0, 0, view_width, view_height))
+        
+        # Create and configure the text field with rounded corners
+        self._textfield = NSTextField.alloc().initWithFrame_(
+            NSMakeRect(left_margin, bottom_margin, dimensions[0], dimensions[1])
+        )
+        self._textfield.setStringValue_(value)
+        self._textfield.setPlaceholderString_(placeholder)
+        
+        # Set rounded bezel style for modern appearance
+        self._textfield.setBezeled_(True)
+        self._textfield.setBezelStyle_(1)  # NSTextFieldRoundedBezel
+        
+        self._textfield.setTarget_(NSApp)
+        
+        self._menuitem = NSMenuItem.alloc().init()
+        self._menuitem.setTarget_(NSApp)
+        self._view.addSubview_(self._textfield)
+        self._menuitem.setView_(self._view)
+        self.set_callback(callback)
+
+    def __repr__(self):
+        return '<{0}: [value: {1}; callback: {2}]>'.format(
+            type(self).__name__,
+            repr(self.value),
+            repr(self.callback)
+        )
+
+    def set_callback(self, callback):
+        """Set the function serving as callback for when text changes or Enter is pressed in this menu item.
+
+        :param callback: the function to be called when the user edits the text field.
+        """
+        NSApp._ns_to_py_and_callback[self._textfield] = self, callback
+        self._textfield.setAction_('callback:' if callback is not None else None)
+
+    @property
+    def callback(self):
+        return NSApp._ns_to_py_and_callback[self._textfield][1]
+
+    @property
+    def value(self):
+        """The current text value of the text field."""
+        return self._textfield.stringValue()
+
+    @value.setter
+    def value(self, new_value):
+        self._textfield.setStringValue_(new_value)
+
+    @property
+    def placeholder(self):
+        """The placeholder text shown when the field is empty."""
+        return self._textfield.placeholderString()
+
+    @placeholder.setter
+    def placeholder(self, new_placeholder):
+        self._textfield.setPlaceholderString_(new_placeholder)
 
 
 class SeparatorMenuItem(object):
