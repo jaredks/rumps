@@ -330,6 +330,9 @@ Works Made With rumps
 `lil_ip_toolbar - mchlrtkwski
 <https://github.com/mchlrtkwski/lil_ip_toolbar/>`_
 
+`LTOTD - jrigles
+<https://github.com/jriggles/ltotd/>`_
+
 `mac-shrew - mejmo
 <https://github.com/mejmo/mac-shrew/>`_
 
@@ -395,6 +398,9 @@ Works Made With rumps
 
 `osx-myair - CameronEx
 <https://github.com/CameronEx/osx-myair/>`_
+
+`PDBar - jriggles
+<https://github.com/jriggles/pdbar/>`_
 
 `PennAppsX - yousufmsoliman
 <https://github.com/yousufmsoliman/PennAppsX/>`_
