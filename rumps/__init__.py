@@ -24,7 +24,7 @@ __copyright__ = 'Copyright 2020 Jared Suttles'
 
 from . import notifications as _notifications
 from .rumps import (separator, debug_mode, alert, application_support, timers, quit_application, timer,
-                    clicked, MenuItem, SliderMenuItem, Timer, Window, App, slider)
+                    clicked, MenuItem, SliderMenuItem, TextFieldMenuItem, Timer, Window, App, slider, text_field)
 
 notifications = _notifications.on_notification
 notification = _notifications.notify
